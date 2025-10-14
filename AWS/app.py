@@ -3,11 +3,11 @@ import os
 
 import aws_cdk as cdk
 
-from smekeri_cloud_projekat.smekeri_cloud_projekat_stack import SmekeriCloudProjekatStack
+from aws.aws_stack import AwsStack
 
 
 app = cdk.App()
-SmekeriCloudProjekatStack(app, "SmekeriCloudProjekatStack",
+AwsStack(app, "AwsStack",
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.
