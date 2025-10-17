@@ -2,7 +2,10 @@ from aws_cdk import (
     Stack,
     aws_dynamodb as dynamodb,
     aws_s3 as s3,
+    aws_apigateway as apigw,
     RemovalPolicy,
+    aws_lambda as _lambda,
+    aws_iam as iam
 )
 from constructs import Construct
 
@@ -11,12 +14,10 @@ class SlopifyStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # ====================================================
-        # 🪣 S3 Bucket for songs, images, and user uploads
-        # ====================================================
+        #S3
         bucket = s3.Bucket(
             self, "SlopifyBucket",
-            bucket_name="slopify-bucket",  # must be globally unique
+            bucket_name="slopify-bucket",
             versioned=True,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             removal_policy=RemovalPolicy.DESTROY,
@@ -129,3 +130,45 @@ class SlopifyStack(Stack):
             sort_key=dynamodb.Attribute(name="userId", type=dynamodb.AttributeType.STRING),
             removal_policy=RemovalPolicy.DESTROY
         )
+
+        #Api stuff
+
+        api = apigw.RestApi(self, "SlopifyApi",
+            rest_api_name="Slopify API",
+            description="Super cool API"
+        )
+
+        #Song lambdas
+        
+        get_songs_lambda = _lambda.Function(
+            self, "GetSongsHandler",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda/song"),
+            environment={'TABLE_NAME': song_table.table_name},
+            handler="get_all.get_all"
+        )
+
+        create_song_lambda = _lambda.Function(
+            self, "CreateSongHandler",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda/song"),
+            handler="create.handle",
+            environment={
+                'SONG_TABLE': song_table.table_name,
+                'ARTIST_TABLE': artist_table.table_name,
+                'ARTIST_SONGS': artist_songs.table_name
+            }
+        )
+
+        #Song API
+
+        api_songs = api.root.add_resource("songs")
+        api_songs.add_method("GET", apigw.LambdaIntegration(get_songs_lambda))
+        api_songs.add_method("POST", apigw.LambdaIntegration(create_song_lambda))
+
+        #Song table lambdas
+
+        song_table.grant_read_data(get_songs_lambda)
+        song_table.grant_read_write_data(create_song_lambda)
+        
+        bucket.grant_read_write(create_song_lambda)
