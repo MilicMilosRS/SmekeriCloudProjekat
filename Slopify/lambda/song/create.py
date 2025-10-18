@@ -12,11 +12,14 @@ s3 = boto3.client("s3")
 song_table = dynamodb.Table(os.environ["SONG_TABLE"])
 artist_table = dynamodb.Table(os.environ["ARTIST_TABLE"])
 artist_songs_table = dynamodb.Table(os.environ["ARTIST_SONGS"])
+genre_content_table = dynamodb.Table(os.environ["GENRE_TABLE"])
+CLOUDFRONT_URL = os.environ["CLOUDFRONT_URL"]
 
 """Request body should be like
 {
 title,
-genres: [name1, name2...]
+genres: [name1, name2...],
+artistIds: [id1, id2...],
 songMp3Data,
 imageData
 }
@@ -31,7 +34,9 @@ def handle(event, context):
             body = json.loads(body_raw)
         print("body loaded")
         title = body.get("title")
-        genres = body.get("genres", [])
+        genres = [g.strip().upper() for g in body.get("genres", [])]
+        print(body)
+        print(genres)
 
         #Fajlovi u base64
         song_data = body.get("songMp3Data")
@@ -65,9 +70,8 @@ def handle(event, context):
         item = {
             "id": str(uuid.uuid4()),
             "title": title,
-            "genres": genres,
-            "s3SongUrl": f"https://slopify-bucket.s3.amazonaws.com/{song_filename}",
-            "s3ImageUrl": f"https://slopify-bucket.s3.amazonaws.com/{image_filename}",
+            "s3SongUrl": f"{CLOUDFRONT_URL}/{song_filename}",
+            "s3ImageUrl": f"{CLOUDFRONT_URL}/{image_filename}",
             "fileName": song_filename.split('/')[-1],
             "fileType": "audio/mpeg",
             "fileSize": file_size,
@@ -75,8 +79,27 @@ def handle(event, context):
             "updatedAt": modification_time,
             "duration": duration
         }
-
         song_table.put_item(Item=item)
+
+        for id in body.get("artistIds", []):
+            response = artist_table.get_item(Key={'id': id})
+            if 'Item' not in response:
+                return {'statusCode': 404 }
+            artist = response['Item']
+            artist_songs_table.put_item(Item={
+                'artistId': id,
+                'songId': item['id'],
+                'songName': title,
+                'artistName': artist['name']
+            })
+
+        for genre in genres:
+            genre_content_table.put_item(Item={
+                'genreName': genre,
+                'contentId': f"SONG#{item['id']}",
+                "contentName": item['title']
+            })
+
 
         return {'statusCode': 200 }
     except Exception as e:

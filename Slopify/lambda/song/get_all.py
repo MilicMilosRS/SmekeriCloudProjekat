@@ -10,6 +10,11 @@ def get_all(event, context):
     response = table.scan()
     items = response.get("Items", [])
 
-    res = ({})
+    res = [{"id": item["id"],
+            "title": item["title"],
+            "genres": item["genres"],
+            "imageUrl": item["s3ImageUrl"],
+            "songUrl": item["s3SongUrl"]
+            } for item in items]
 
-    return {'statusCode': 200, 'body': json.dumps({'items': items})}
+    return {'statusCode': 200, 'body': json.dumps(res)}
