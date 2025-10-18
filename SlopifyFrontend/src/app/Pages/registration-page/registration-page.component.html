@@ -1,0 +1,25 @@
+<h2>Register</h2>
+
+<form (ngSubmit)="register()">
+  <label>First Name:</label>
+  <input type="text" [(ngModel)]="registrationData.firstName" name="firstName" required /><br />
+
+  <label>Last Name:</label>
+  <input type="text" [(ngModel)]="registrationData.lastName" name="lastName" required /><br />
+
+  <label>Username:</label>
+  <input type="text" [(ngModel)]="registrationData.username" name="username" required /><br />
+
+  <label>Email:</label>
+  <input type="email" [(ngModel)]="registrationData.email" name="email" required /><br />
+
+  <label>Birthday:</label>
+  <input type="date" [(ngModel)]="registrationData.birthDate" name="birthday" required /><br />
+
+  <label>Password:</label>
+  <input type="password" [(ngModel)]="registrationData.password" name="password" required /><br />
+
+  <button type="submit">Register</button>
+</form>
+
+<p>{{ message }}</p>

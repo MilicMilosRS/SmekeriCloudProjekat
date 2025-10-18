@@ -161,7 +161,7 @@ class SlopifyStack(Stack):
             standard_attributes=cognito.StandardAttributes(
                 given_name=cognito.StandardAttribute(required=True, mutable=True),
                 family_name=cognito.StandardAttribute(required=True, mutable=True),
-                birthdate=cognito.StandardAttribute(required=True, mutable=True)
+                birthdate=cognito.StandardAttribute(required=True, mutable=True),
             ),
             password_policy=cognito.PasswordPolicy(
                 min_length=8,
