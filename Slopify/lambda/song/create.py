@@ -14,6 +14,7 @@ artist_table = dynamodb.Table(os.environ["ARTIST_TABLE"])
 artist_songs_table = dynamodb.Table(os.environ["ARTIST_SONGS"])
 genre_content_table = dynamodb.Table(os.environ["GENRE_TABLE"])
 CLOUDFRONT_URL = os.environ["CLOUDFRONT_URL"]
+bucket_name = os.environ["BUCKET_NAME"]
 
 """Request body should be like
 {
@@ -54,8 +55,8 @@ def handle(event, context):
         image_filename = f"images/{uuid.uuid4()}.jpg"
 
         #Upload na S3
-        s3.put_object(Bucket="slopify-bucket", Key=song_filename, Body=song_bytes, ContentType='audio/mpeg')
-        s3.put_object(Bucket="slopify-bucket", Key=image_filename, Body=image_bytes, ContentType='image/jpeg')
+        s3.put_object(Bucket=bucket_name, Key=song_filename, Body=song_bytes, ContentType='audio/mpeg')
+        s3.put_object(Bucket=bucket_name, Key=image_filename, Body=image_bytes, ContentType='image/jpeg')
         print("objects uploaded to s3")
         # MP3 metapodaci
         mp3_file = io.BytesIO(song_bytes)

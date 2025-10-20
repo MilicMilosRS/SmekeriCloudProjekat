@@ -12,7 +12,6 @@ def get_all(event, context):
 
     res = [{"id": item["id"],
             "title": item["title"],
-            "genres": item["genres"],
             "imageUrl": item["s3ImageUrl"],
             "songUrl": item["s3SongUrl"]
             } for item in items]
