@@ -26,13 +26,13 @@ class NotificationStack(Stack):
         )
 
         self.notification_topic.add_subscription(
-            subs.EmailSubscription("your.email@example.com")
+            subs.EmailSubscription("mirkodjukic314@gmail.com")
         )
 
         self.notify_lambda = _lambda.Function(
             self, "NotifyLambda",
             runtime=_lambda.Runtime.PYTHON_3_9,
-            handler="notify.handler",
+            handler="notify.handle",
             code=_lambda.Code.from_asset("lambda/notifications"),
             environment={
                 "TOPIC_ARN": self.notification_topic.topic_arn,

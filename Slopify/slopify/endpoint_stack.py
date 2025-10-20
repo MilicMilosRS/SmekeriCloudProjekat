@@ -8,9 +8,11 @@ from aws_cdk import (
 )
 from constructs import Construct
 
+from slopify import notification_stack
+
 class EndpointStack(Stack):
 
-    def __init__(self, scope: Construct, id: str, song_stack, artist_stack, genre_stack, user_stack, auth_stack, **kwargs):
+    def __init__(self, scope: Construct, id: str, song_stack, artist_stack, genre_stack, user_stack, auth_stack, notification_stack, **kwargs):
         super().__init__(scope, id, **kwargs)
 
         
@@ -26,7 +28,7 @@ class EndpointStack(Stack):
                 allow_headers=["Content-Type", "Authorization"],
             )
         )
-
+        self.notification_stack = notification_stack
         self.authorizer = apigw.CognitoUserPoolsAuthorizer(
             self, "CognitoAuthorizer",
             cognito_user_pools=[auth_stack.user_pool],
@@ -67,5 +69,21 @@ class EndpointStack(Stack):
             authorization_type=apigw.AuthorizationType.COGNITO,
             authorizer=self.authorizer)
 
+        #Notification
+        notifications_resource = self.api.root.add_resource(
+            "notifications",
+            default_cors_preflight_options=apigw.CorsOptions(
+                allow_origins=apigw.Cors.ALL_ORIGINS,
+                allow_methods=["POST", "OPTIONS"],
+                allow_headers=["Content-Type", "Authorization"]
+            )
+        )
+
+        notifications_resource.add_method(
+            "POST",
+            apigw.LambdaIntegration(self.notification_stack.notify_lambda),
+        )
+
+        
         CfnOutput(self, "ApiUrl", value=self.api.url)
 

@@ -51,4 +51,11 @@ export class ArtistDetailsPageComponent implements OnInit{
       error: (error) => {console.log(error)}
     })
   }
+  testSubscription() {
+  this.userService.test().subscribe({
+    next: (res) => console.log('Test trigger successful', res),
+    error: (err) => console.error('Test trigger failed', err)
+  });
+}
+
 }

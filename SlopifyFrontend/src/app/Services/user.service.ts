@@ -17,4 +17,10 @@ export class UserService {
   subscribe(data: SubscribeDTO){
     return this.http.post(`${env.apiUrl}/user/subscriptions`, data)
   }
+
+  test() {
+    return this.http.post(`${env.apiUrl}/notifications`, {});
+  }
+
+
 }
