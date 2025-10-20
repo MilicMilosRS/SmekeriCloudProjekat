@@ -44,9 +44,20 @@ class SongStack(Stack):
             }
         )
 
+        self.lambda_get_details = _lambda.Function(
+            self, "GetSongDetailsHandler",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda/song"),
+            handler="get_details.handle",
+            environment={
+                'SONG_TABLE': self.song_table.table_name,
+            }
+        )
+
         # Grants
         self.song_table.grant_read_data(self.lambda_get_songs)
         self.song_table.grant_read_write_data(self.lambda_create_song)
+        self.song_table.grant_read_data(self.lambda_get_details)
         artist_stack.artist_table.grant_read_data(self.lambda_create_song)
         artist_stack.artist_songs.grant_read_write_data(self.lambda_create_song)
         genre_stack.genre_content.grant_read_write_data(self.lambda_create_song)

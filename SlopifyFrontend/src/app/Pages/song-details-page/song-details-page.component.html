@@ -1,0 +1,15 @@
+<h1>{{ details.title }}</h1>
+
+<p><strong>ID:</strong> {{ details.id }}</p>
+<p><strong>Transcript:</strong></p>
+<p>{{ details.transcript }}</p>
+
+<p><strong>Created At:</strong> {{ details.createdAt }}</p>
+
+<div *ngIf="details.s3ImageUrl">
+  <img [src]="details.s3ImageUrl" alt="Song Image">
+</div>
+
+<div *ngIf="details.s3SongUrl">
+  <audio [src]="details.s3SongUrl" controls></audio>
+</div>

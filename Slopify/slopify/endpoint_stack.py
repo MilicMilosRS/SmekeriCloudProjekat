@@ -10,28 +10,60 @@ from constructs import Construct
 
 class EndpointStack(Stack):
 
-    def __init__(self, scope: Construct, id: str, song_stack, artist_stack, genre_stack, **kwargs):
+    def __init__(self, scope: Construct, id: str, song_stack, artist_stack, genre_stack, user_stack, auth_stack, **kwargs):
         super().__init__(scope, id, **kwargs)
 
         
         # API Gateway
         self.api = apigw.RestApi(self, "SlopifyApi",
             rest_api_name="Slopify API",
-            description="Main Slopify API Gateway"
+            description="Main Slopify API Gateway",
+            deploy=True,
+            deploy_options=apigw.StageOptions(stage_name="dev"),
+            default_cors_preflight_options=apigw.CorsOptions(
+                allow_origins=apigw.Cors.ALL_ORIGINS,
+                allow_methods=["GET", "OPTIONS", "PUT", "POST", "DELETE"],
+                allow_headers=["Content-Type", "Authorization"],
+            )
         )
 
+        self.authorizer = apigw.CognitoUserPoolsAuthorizer(
+            self, "CognitoAuthorizer",
+            cognito_user_pools=[auth_stack.user_pool],
+            authorizer_name="SlopifyCognitoAuthorizer"
+        )
         
-        # API
+        #API
+        #Songs
         songs_resource = self.api.root.add_resource("songs")
         songs_resource.add_method("GET", apigw.LambdaIntegration(song_stack.lambda_get_songs))
         songs_resource.add_method("POST", apigw.LambdaIntegration(song_stack.lambda_create_song))
+        songs_id_resource = songs_resource.add_resource("{id}")
+        songs_id_resource.add_method("GET", apigw.LambdaIntegration(song_stack.lambda_get_details))
 
+        #content
         contents_resource = self.api.root.add_resource("contents")
         contents_resource.add_method("GET", apigw.LambdaIntegration(genre_stack.lambda_get_content))
 
+        #Artists
         artists_resource = self.api.root.add_resource("artists")
         artists_resource.add_method("POST", apigw.LambdaIntegration(artist_stack.lambda_create_artist))
 
+        #Users
+        user_resource = self.api.root.add_resource("user")
+        user_sub_resourse = user_resource.add_resource("subscriptions")
+        user_resource.add_method(
+            "GET", apigw.LambdaIntegration(user_stack.lambda_get_user_data),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=self.authorizer)
+        user_sub_resourse.add_method(
+            "GET", apigw.LambdaIntegration(user_stack.lambda_get_subscriptions),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=self.authorizer)
+        user_sub_resourse.add_method(
+            "POST", apigw.LambdaIntegration(user_stack.lambda_subscribe),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=self.authorizer)
 
         CfnOutput(self, "ApiUrl", value=self.api.url)
 

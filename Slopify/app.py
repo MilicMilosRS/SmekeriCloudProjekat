@@ -18,6 +18,6 @@ artist = ArtistStack(app, "ArtistStack", core=core, genre_stack=genre)
 song = SongStack(app, "SongStack", core=core, artist_stack=artist, genre_stack=genre)
 user = UserStack(app, "UserStack")
 album = AlbumStack(app, "AlbumStack")
-endpoint = EndpointStack(app, "EndpointStack", song_stack=song, artist_stack=artist, genre_stack=genre)
+endpoint = EndpointStack(app, "EndpointStack", song_stack=song, artist_stack=artist, genre_stack=genre, user_stack=user, auth_stack=auth)
 
 app.synth()
