@@ -48,6 +48,8 @@ class EndpointStack(Stack):
         #Artists
         artists_resource = self.api.root.add_resource("artists")
         artists_resource.add_method("POST", apigw.LambdaIntegration(artist_stack.lambda_create_artist))
+        artists_id_resource = artists_resource.add_resource("{id}")
+        artists_id_resource.add_method("GET", apigw.LambdaIntegration(artist_stack.lambda_get_artist_details))
 
         #Users
         user_resource = self.api.root.add_resource("user")

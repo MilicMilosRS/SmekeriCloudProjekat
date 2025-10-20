@@ -46,7 +46,7 @@ class UserStack(Stack):
             self, "SubscribeHandler",
             runtime=_lambda.Runtime.PYTHON_3_9,
             code=_lambda.Code.from_asset("lambda/user"),
-            environment={"SUBSCRIBE": self.user_subs.table_name},
+            environment={"SUBSCRIBE_TABLE": self.user_subs.table_name},
             handler="subscribe.handler",
         )
 

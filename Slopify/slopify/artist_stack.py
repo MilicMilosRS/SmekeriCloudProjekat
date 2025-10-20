@@ -46,5 +46,18 @@ class ArtistStack(Stack):
             }
         )
 
+        self.lambda_get_artist_details = _lambda.Function(
+            self, "GetArtistDetailsHandler",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda/artist"),
+            handler="get_details.handle",
+            environment={
+                'ARTIST_TABLE': self.artist_table.table_name,
+                'GENRE_TABLE': genre_stack.genre_content.table_name
+            }
+        )
+
         self.artist_table.grant_read_write_data(self.lambda_create_artist)
+        self.artist_table.grant_read_data(self.lambda_get_artist_details)
+        genre_stack.genre_content.grant_read_data(self.lambda_get_artist_details)
         genre_stack.genre_content.grant_read_write_data(self.lambda_create_artist)

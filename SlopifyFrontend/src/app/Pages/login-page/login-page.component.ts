@@ -24,6 +24,10 @@ export class LoginPageComponent {
     this.message = success ? 'Login successful!' : 'Login failed!';
   }
 
+  async logout(){
+    await this.authService.logout();
+  }
+
   getUserData(){
     this.userService.getUserData().subscribe({
       next: (value) => {console.log(value);

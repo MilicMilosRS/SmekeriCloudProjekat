@@ -7,12 +7,12 @@ from boto3.dynamodb.conditions import Key
 dynamodb = boto3.resource("dynamodb")
 user_subscriptions_table = dynamodb.Table(os.environ["SUBSCRIBE_TABLE"])
 
-#Body contains {contentId, contentType}
+#Body contains {contentId, contentType, contentName}
 #contentType = genre or song or artist
-def handle(event, context):
+def handler(event, context):
     try:
         claims = event.get('requestContext', {}).get('authorizer', {}).get('claims', {})
-        username = claims.get('cognito:username')
+        email = claims.get('email')
         
         body_raw = event.get("body", "{}")
         if isinstance(body_raw, dict):
@@ -22,7 +22,8 @@ def handle(event, context):
 
         contentType = body.get('contentType', "")
         contentId = body.get('contentId', "")
-        if not (contentType and contentId):
+        contentName = body.get('contentName', "")
+        if not (contentType and contentId and contentName):
             return {"statusCode": 400,
                 "headers": {
                     "Access-Control-Allow-Origin": "*",
@@ -32,9 +33,8 @@ def handle(event, context):
                 }
 
         response = user_subscriptions_table.query(
-                KeyConditionExpression=Key('username').eq(username) &
-                                     Key('contentId').eq(body.get('contentType', "") + body.get('contentId', ""))
-            )
+                KeyConditionExpression=Key('userId').eq(email) &
+                                     Key('contentId').eq(contentType + "#" + contentId))
         items = response.get("Items", [])
         if items != []:
             return {"statusCode": 400,
@@ -44,6 +44,13 @@ def handle(event, context):
                     "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE"
                 }
             }
+        
+        item = {
+            "userId": email,
+            "contentId": contentType + "#" + contentId,
+            "contentName": contentName
+        }
+        user_subscriptions_table.put_item(Item=item)
 
         return {"statusCode": 200,
             "headers": {
@@ -57,6 +64,11 @@ def handle(event, context):
         print("ERROR:", e)
         traceback.print_exc()
         return {
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type,Authorization",
+                "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE"
+            },
             'statusCode': 500,
             'body': json.dumps({'error': str(e)})
         }

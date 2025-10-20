@@ -1,0 +1,15 @@
+<h1>{{ details.name }}</h1>
+
+<button (click)="srbine()"></button>
+
+<p><strong>ID:</strong> {{ details.id }}</p>
+
+<p><strong>Bio:</strong></p>
+<p>{{ details.bio }}</p>
+
+<div *ngIf="details.genres && details.genres.length > 0">
+  <p><strong>Genres:</strong></p>
+  <ul>
+    <li *ngFor="let genre of details.genres">{{ genre }}</li>
+  </ul>
+</div>

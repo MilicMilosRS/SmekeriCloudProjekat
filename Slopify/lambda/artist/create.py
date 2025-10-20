@@ -5,7 +5,6 @@ import uuid
 import base64
 import datetime
 import os
-from mutagen.mp3 import MP3
 
 dynamodb = boto3.resource("dynamodb")
 artist_table = dynamodb.Table(os.environ["ARTIST_TABLE"])
@@ -42,7 +41,6 @@ def handle(event, context):
             "id": str(uuid.uuid4()),
             "name": name,
             "bio": bio,
-            "genres": genres
         }
         artist_table.put_item(Item=item)
 
