@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import aws_cdk as cdk
+from slopify.notification_stack import NotificationStack
 from slopify.core_stack import CoreStack
 from slopify.auth_stack import AuthStack
 from slopify.genre_stack import GenreStack
@@ -18,6 +19,7 @@ artist = ArtistStack(app, "ArtistStack", core=core, genre_stack=genre)
 song = SongStack(app, "SongStack", core=core, artist_stack=artist, genre_stack=genre)
 user = UserStack(app, "UserStack")
 album = AlbumStack(app, "AlbumStack")
+notification = NotificationStack(app,"NotificationStack")
 endpoint = EndpointStack(app, "EndpointStack", song_stack=song, artist_stack=artist, genre_stack=genre)
 
 app.synth()
