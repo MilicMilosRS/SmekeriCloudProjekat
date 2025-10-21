@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../Services/user.service';
 import { UserSubscription } from '../../DTO/UserSubscription';
 import { Router } from '@angular/router';
+import { UnsubscribeDTO } from '../../DTO/UnsubscribeDTO';
 
 @Component({
   selector: 'app-user-subscriptions-page',
@@ -33,5 +34,17 @@ export class UserSubscriptionsPageComponent implements OnInit {
     if (id) {
         this.router.navigate(['/artists', id]);
     }
+  }
+
+  unsubscribe(contentId: string) {
+
+    var data = new UnsubscribeDTO();
+    data.contentType = contentId.split('#')[0];
+    data.contentId = contentId.split('#')[1];
+    this.userService.unsubscribe(data).subscribe({
+      next: () => {
+        this.subscriptions = this.subscriptions.filter(s => s.contentId !== contentId);
+      }
+    })
   }
 }

@@ -1,7 +1,8 @@
 <h1>{{ details.name }}</h1>
 
-<button (click)="subscribeToArtist()">Subscribe</button>
-<button (click)="testSubscription()">testSubscribe</button>
+<button id="subButt" *ngIf="!isSubbed" (click)="subscribeToArtist()">Subscribe</button>
+<button id="unsubButt" *ngIf="isSubbed" (click)="unsubscribeFromArtist()">Unsubscribe</button>
+<!--<button (click)="testSubscription()">testSubscribe</button>-->
 <p><strong>ID:</strong> {{ details.id }}</p>
 
 <p><strong>Bio:</strong></p>
