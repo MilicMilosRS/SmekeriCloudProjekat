@@ -9,10 +9,10 @@ subscriptions_table = dynamodb.Table(os.environ["SUBSCRIPTION_TABLE"])
 
 def handler(event, context):
     claims = event.get('requestContext', {}).get('authorizer', {}).get('claims', {})
-    username = claims.get('cognito:username')
+    username = claims.get('email')
     
     response = subscriptions_table.query(
-        KeyConditionExpression=Key("username").eq(username)
+        KeyConditionExpression=Key("userId").eq(username)
     )
     items = response.get("Items", [])
 

@@ -138,7 +138,14 @@ def handle(event, context):
             })
         )
 
-        return {'statusCode': 200 }
+        return {'statusCode': 200,
+                "headers": {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "Content-Type,Authorization",
+                    "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE"
+                },
+                'body': json.dumps({'id': item['id']})
+                }
     except Exception as e:
         import traceback
         print("ERROR:", e)

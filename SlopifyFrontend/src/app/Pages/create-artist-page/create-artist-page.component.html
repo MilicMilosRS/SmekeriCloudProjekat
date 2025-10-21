@@ -1,0 +1,18 @@
+<h2>Create Artist</h2>
+
+<label>Name:</label>
+<input [(ngModel)]="artist.name" placeholder="Artist name" />
+
+<br />
+
+<label>Bio:</label>
+<textarea [(ngModel)]="artist.bio" placeholder="Short bio"></textarea>
+
+<br />
+
+<label>Genres (comma separated):</label>
+<input [(ngModel)]="genresInput" placeholder="rock, pop, jazz" />
+
+<br />
+
+<button (click)="submit()">Create</button>
