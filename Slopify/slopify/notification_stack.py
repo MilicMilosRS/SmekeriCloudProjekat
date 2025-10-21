@@ -14,7 +14,7 @@ from aws_cdk import (
 from constructs import Construct
 
 class NotificationStack(Stack):
-    def __init__(self, scope: Construct, id: str, **kwargs):
+    def __init__(self, scope: Construct, id: str, user_stack, **kwargs):
         super().__init__(scope, id, **kwargs)
 
         self.subscriptions_table = dynamodb.Table(
@@ -43,7 +43,7 @@ class NotificationStack(Stack):
         )
 
         self.notification_topic.add_subscription(
-            subs.EmailSubscription("mirkodjukic23@gmail.com")
+            subs.SqsSubscription(self.notification_queue)
         )
 
         self.notify_lambda = _lambda.Function(
@@ -52,8 +52,7 @@ class NotificationStack(Stack):
             handler="notify.handle",
             code=_lambda.Code.from_asset("lambda/notifications"),
             environment={
-                "TOPIC_ARN": self.notification_topic.topic_arn,
-                "SUBSCRIPTIONS_TABLE": self.subscriptions_table.table_name
+                "SUBSCRIPTIONS_TABLE": user_stack.user_subs.table_name
             },
                 timeout=Duration.seconds(15),
                 memory_size=512
@@ -72,7 +71,7 @@ class NotificationStack(Stack):
             )
         )
 
-        self.notification_topic.grant_publish(self.notify_lambda)
+        self.notify_lambda.add_event_source(event_sources.SqsEventSource(self.notification_queue))
 
         CfnOutput(self, "NotificationQueueUrl", value=self.notification_queue.queue_url)
         CfnOutput(self, "NotificationTopicArn", value=self.notification_topic.topic_arn)

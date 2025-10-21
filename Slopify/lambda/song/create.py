@@ -15,6 +15,8 @@ artist_songs_table = dynamodb.Table(os.environ["ARTIST_SONGS"])
 genre_content_table = dynamodb.Table(os.environ["GENRE_TABLE"])
 CLOUDFRONT_URL = os.environ["CLOUDFRONT_URL"]
 bucket_name = os.environ["BUCKET_NAME"]
+sns_client = boto3.client("sns")
+
 
 """Request body should be like
 {
@@ -96,6 +98,17 @@ def handle(event, context):
                 'artistName': artist['name']
             })
 
+            sns_client.publish(
+                TopicArn=os.environ["TOPIC_ARN"],
+                Message=json.dumps({
+                    "content_id": f"ARTIST#{id}",
+                    "content_name": f"{artist['name']}",
+                    "song_id": item['id'],
+                    "song_name": title
+                }),
+                Subject="New Slop-Drop!"
+            )
+
         for genre in genres:
             genre_content_table.put_item(Item={
                 'genreName': genre,
@@ -103,29 +116,16 @@ def handle(event, context):
                 "contentName": item['title']
             })
         
-        notification_lambda = boto3.client("lambda")
-
-        for artist_id in body.get("artistIds", []):
-            notification_lambda.invoke(
-                FunctionName=os.environ["NOTIFICATION_LAMBDA"],
-                InvocationType="Event",
-                Payload=json.dumps({
-                    "content_id": f"ARTIST#{artist_id}",
-                    "content_name": title
-                })
-            )
-
-        for genre in genres:
-            notification_lambda.invoke(
-                FunctionName=os.environ["NOTIFICATION_LAMBDA"],
-                InvocationType="Event",
-                Payload=json.dumps({
+            sns_client.publish(
+                TopicArn=os.environ["TOPIC_ARN"],
+                Message=json.dumps({
                     "content_id": f"GENRE#{genre}",
-                    "content_name": title
-                })
+                    "content_name": f"{genre}",
+                    "song_id": item['id'],
+                    "song_name": item['title']
+                }),
+                Subject="New Slop-Drop!"
             )
-
-
 
         sqs = boto3.client('sqs')
         queue_url = os.environ['TRANSCRIPTION_QUEUE_URL']

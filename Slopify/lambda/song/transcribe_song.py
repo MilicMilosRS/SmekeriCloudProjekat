@@ -10,12 +10,13 @@ from vosk import Model, KaldiRecognizer
 dynamodb = boto3.resource("dynamodb")
 s3 = boto3.client("s3")
 song_table = dynamodb.Table(os.environ["SONG_TABLE"])
-bucket_name = os.environ["BUCKET_NAME"]
+bucket_name = os.environ["OUTPUT_BUCKET"]
 
 model_path = "/opt/vosk-model"
 vosk_model = Model(model_path)
 
 def handle(event, context):
+    print("Environment vars:", dict(os.environ))
     for record in event['Records']:
         body = json.loads(record['body'])
         song_id = body['id']
