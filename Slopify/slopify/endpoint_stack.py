@@ -75,14 +75,7 @@ class EndpointStack(Stack):
             authorizer=self.authorizer)
 
         #Notification
-        notifications_resource = self.api.root.add_resource(
-            "notifications",
-            default_cors_preflight_options=apigw.CorsOptions(
-                allow_origins=apigw.Cors.ALL_ORIGINS,
-                allow_methods=["POST", "OPTIONS"],
-                allow_headers=["Content-Type", "Authorization"]
-            )
-        )
+        notifications_resource = self.api.root.add_resource("notifications")
 
         notifications_resource.add_method(
             "POST",

@@ -26,7 +26,7 @@ class NotificationStack(Stack):
         )
 
         self.notification_topic.add_subscription(
-            subs.EmailSubscription("mirkodjukic314@gmail.com")
+            subs.EmailSubscription("mirkodjukic23@gmail.com")
         )
 
         self.notify_lambda = _lambda.Function(
@@ -45,17 +45,19 @@ class NotificationStack(Stack):
                 actions=[
                     "dynamodb:Query",
                     "dynamodb:GetItem",
-                    "dynamodb:Scan"
+                    "dynamodb:Scan",
+                    "ses:SendEmail", "ses:SendRawEmail"
                 ],
+
                 resources=["*"] 
             )
         )
 
         self.notification_topic.grant_publish(self.notify_lambda)
 
-        self.notify_lambda.add_event_source(
-            event_sources.SqsEventSource(self.notification_queue)
-        )
+        # self.notify_lambda.add_event_source(
+        #     event_sources.SqsEventSource(self.notification_queue)
+        # )
 
         CfnOutput(self, "NotificationQueueUrl", value=self.notification_queue.queue_url)
         CfnOutput(self, "NotificationTopicArn", value=self.notification_topic.topic_arn)

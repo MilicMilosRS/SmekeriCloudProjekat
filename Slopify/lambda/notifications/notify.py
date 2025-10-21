@@ -8,13 +8,16 @@ ses = boto3.client('ses', region_name='eu-central-1')
 
 SUBS_TABLE = os.environ['SUBSCRIPTIONS_TABLE']
 subscriptions_table = dynamodb.Table(SUBS_TABLE)
-FROM_EMAIL = "your_verified_email@example.com"
+FROM_EMAIL = "mirkodjukic23@gmail.com"
 
 def handle(event, context):
-    for record in event['Records']:
-        body = json.loads(record['body'])
-        content_id = body['content_id']
-        content_name = body.get('content_name', 'New content')
+    try:
+        # for record in event['Records']:
+        # body = json.loads(record['body'])
+        # content_id = body['content_id']
+        # content_name = body.get('content_name', 'New content')
+        content_id = 'ARTIST#6b417897-fcb0-453a-815b-4f6d770e5f72'
+        content_name = 'Mirzina jetra'
 
         if content_id.startswith("SONG#"):
             content_type = "song"
@@ -24,42 +27,53 @@ def handle(event, context):
             content_type = "genre"
         else:
             print(f"Unknown content type for content: {content_id}")
-            continue
+            # continue
 
         response = subscriptions_table.query(
-            IndexName="contentId-userId-index",
+            IndexName="ContentIdIndex",
             KeyConditionExpression=Key('contentId').eq(content_id)
         )
 
         subscribers = response.get('Items', [])
-        if not subscribers:
-            continue
+        # if subscribers == []:
+        #     continue
 
         for user in subscribers:
-            email = user.get('email')
-            username = user.get('username', 'unknown_user')
+            email = user.get('userId')
             if email:
                 ses.send_email(
                     Source=FROM_EMAIL,
                     Destination={"ToAddresses": [email]},
                     Message={
                         "Subject": {
-                            "Data": f"New slop just dropped: {content_type.title()}"
+                            "Data": f"New slop-drop: {content_type.title()}"
                         },
                         "Body": {
                             "Text": {
-                                "Data": f"New content drop for user {username}!\n\nNew {content_type} content published: {content_name}!"
+                                "Data": f"New content drop for You!\n\nNew {content_type} content published: {content_name}!"
                             }
                         }
                     }
                 )
-
-    return {
-        "statusCode": 200,
-        "headers": {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "OPTIONS,POST",
-            "Access-Control-Allow-Headers": "Content-Type,Authorization"
-        },
-        "body": json.dumps({"message": "Notification sent"})
-    }
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "OPTIONS,POST",
+                "Access-Control-Allow-Headers": "Content-Type,Authorization"
+            },
+            "body": json.dumps({"message": "Notification sent"})
+        }
+    except Exception as e:
+        import traceback
+        print("ERROR:", e)
+        traceback.print_exc()
+        return {
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type,Authorization",
+                "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE"
+            },
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }
