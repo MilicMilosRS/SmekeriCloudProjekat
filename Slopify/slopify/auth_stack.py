@@ -38,27 +38,25 @@ class AuthStack(Stack):
             user_pool=self.user_pool
         )
 
-        # Groups
+        #groups
         cognito.CfnUserPoolGroup(
             self, "AdminsGroup",
             user_pool_id=self.user_pool.user_pool_id,
             group_name="admins"
         )
-
         cognito.CfnUserPoolGroup(
             self, "UsersGroup",
             user_pool_id=self.user_pool.user_pool_id,
             group_name="users"
         )
 
-        # Lambda Triggers
+        #lambda triggers
         pre_sign_up = _lambda.Function(
             self, "PreSignUpHandler",
             runtime=_lambda.Runtime.PYTHON_3_9,
             code=_lambda.Code.from_asset("lambda/auth"),
             handler="pre_sign_up.handle"
         )
-
         pre_sign_up.add_to_role_policy(iam.PolicyStatement(
             actions=[
                 "cognito-idp:ListUsers"

@@ -5,7 +5,7 @@ def handle(event, context):
     user_pool_id = event['userPoolId']
     email = event['request']['userAttributes']['email']
 
-    # Check if user with this email already exists
+    #check if user with this email already exists
     response = client.list_users(
         UserPoolId=user_pool_id,
         Filter=f'email = "{email}"'
