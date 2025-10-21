@@ -14,7 +14,7 @@ artist_table = dynamodb.Table(os.environ["ARTIST_TABLE"])
 artist_songs_table = dynamodb.Table(os.environ["ARTIST_SONGS"])
 genre_content_table = dynamodb.Table(os.environ["GENRE_TABLE"])
 CLOUDFRONT_URL = os.environ["CLOUDFRONT_URL"]
-bucket_name = os.environ["BUCKET_NAME"]
+bucket_name = os.environ["OUTPUT_BUCKET"]
 sns_client = boto3.client("sns")
 
 
