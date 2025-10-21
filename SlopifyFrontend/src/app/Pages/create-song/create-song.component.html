@@ -1,0 +1,31 @@
+<h2>Create Song</h2>
+
+<form (ngSubmit)="submit()">
+
+  <label>Title:</label><br>
+  <input type="text" [(ngModel)]="song.title" name="title"><br><br>
+
+  <label>Artists:</label><br>
+  <select [(ngModel)]="selectedArtistId" name="artistSelect">
+    <option value="">--Select Artist--</option>
+    <option *ngFor="let artist of availableArtists" [value]="artist.id">{{artist.name}}</option>
+  </select>
+  <button type="button" (click)="addArtist()">Add</button><br>
+
+  <ul>
+    <li *ngFor="let artistId of song.artistIds">
+      {{artistId}} <button type="button" (click)="removeArtist(artistId)">Remove</button>
+    </li>
+  </ul><br>
+
+  <label>Genres (comma separated):</label><br>
+  <input type="text" [(ngModel)]="genresInput" name="genres"><br><br>
+
+  <label>Song MP3:</label><br>
+  <input type="file" (change)="onMp3Change($event)" accept=".mp3"><br><br>
+
+  <label>Image:</label><br>
+  <input type="file" (change)="onImageChange($event)" accept="image/*"><br><br>
+
+  <button type="submit">Create Song</button>
+</form>

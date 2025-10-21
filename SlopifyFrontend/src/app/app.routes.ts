@@ -6,11 +6,13 @@ import { ArtistDetailsPageComponent } from './Pages/artist-details-page/artist-d
 import { MainPageComponentComponent } from './Pages/main-page-component/main-page-component.component';
 import { UserSubscriptionsPageComponent } from './Pages/user-subscriptions-page/user-subscriptions-page.component';
 import { HomePageComponent } from './Pages/home-page/home-page.component';
+import { CreateSongComponent } from './Pages/create-song/create-song.component';
 
 export const routes: Routes = [
     {path:'register', component: RegistrationPageComponent},
     {path:'login', component: LoginPageComponent},
     {path:'songs/:id', component: SongDetailsPageComponent},
+    {path:'songs/new', component: CreateSongComponent},
     {path:'artists/:id', component: ArtistDetailsPageComponent},
     {path:'', component: MainPageComponentComponent},
     {path:'subscriptions', component: UserSubscriptionsPageComponent}
