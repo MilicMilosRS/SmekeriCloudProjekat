@@ -28,6 +28,7 @@ class EndpointStack(Stack):
                 allow_headers=["Content-Type", "Authorization"],
             )
         )
+
         self.notification_stack = notification_stack
         self.authorizer = apigw.CognitoUserPoolsAuthorizer(
             self, "CognitoAuthorizer",
@@ -46,6 +47,10 @@ class EndpointStack(Stack):
         #content
         contents_resource = self.api.root.add_resource("contents")
         contents_resource.add_method("GET", apigw.LambdaIntegration(genre_stack.lambda_get_content))
+
+        #Genres
+        genre_resource = self.api.root.add_resource("genres")
+        genre_resource.add_method("GET", apigw.LambdaIntegration(genre_stack.lambda_get_all))
 
         #Artists
         artists_resource = self.api.root.add_resource("artists")
