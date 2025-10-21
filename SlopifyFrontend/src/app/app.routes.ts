@@ -11,8 +11,8 @@ import { CreateSongComponent } from './Pages/create-song/create-song.component';
 export const routes: Routes = [
     {path:'register', component: RegistrationPageComponent},
     {path:'login', component: LoginPageComponent},
-    {path:'songs/:id', component: SongDetailsPageComponent},
     {path:'songs/new', component: CreateSongComponent},
+    {path:'songs/:id', component: SongDetailsPageComponent},
     {path:'artists/:id', component: ArtistDetailsPageComponent},
     {path:'', component: MainPageComponentComponent},
     {path:'subscriptions', component: UserSubscriptionsPageComponent}

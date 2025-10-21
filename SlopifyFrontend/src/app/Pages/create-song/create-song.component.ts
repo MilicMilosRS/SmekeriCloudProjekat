@@ -70,8 +70,7 @@ export class CreateSongComponent implements OnInit {
       .map(g => g.trim())
       .filter(g => g.length > 0);
 
-    console.log('Song DTO to submit:', this.song);
-    this.songService.createSong(this.song);
+    this.songService.createSong(this.song).subscribe();
   }
 
 }
