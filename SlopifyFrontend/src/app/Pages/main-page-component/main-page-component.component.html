@@ -10,6 +10,7 @@
   <table border="1">
     <tr *ngFor="let a of artists">
       <td>{{ a.name }}</td>
+      <td><button (click)="viewArtist(a.contentId)" id="view">View</button></td>
     </tr>
   </table>
 

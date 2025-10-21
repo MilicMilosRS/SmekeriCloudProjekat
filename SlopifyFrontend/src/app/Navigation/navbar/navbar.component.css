@@ -9,6 +9,7 @@
 .container > h1 {
     color:rgb(238, 235, 235);
     font-size: 35px;
+    cursor: pointer;
 }
 
 .container > button {
@@ -19,4 +20,5 @@
     background-color: rgb(129, 128, 128);
     padding: 15px;
     color:aliceblue;
+    cursor: pointer;
 }

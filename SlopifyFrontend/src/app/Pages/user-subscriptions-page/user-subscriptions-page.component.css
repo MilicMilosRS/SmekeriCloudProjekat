@@ -1,0 +1,48 @@
+.container {
+    margin: 10px;
+}
+
+.cardsContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.subCard {
+    background-color: rgb(34, 34, 34);
+    color: rgb(184, 184, 184);
+    gap:5px;
+    padding: 10px;
+    border-radius: 20px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+
+#view {
+    background-color: rgb(98, 98, 221);
+    color: rgb(184, 184, 184);
+    border-radius: 10px;
+    border: 0;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+#unsub {
+    background-color: rgb(218, 90, 90);
+    color: rgb(184, 184, 184);
+    border-radius: 10px;
+    border: 0;
+    padding: 5px;
+    font-size: 15px;
+    cursor: pointer;
+}

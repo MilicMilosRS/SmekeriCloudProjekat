@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GenreService } from '../../Services/genre.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main-page-component',
@@ -23,6 +24,7 @@ export class MainPageComponentComponent {
   constructor(
     private http: HttpClient,
     private genreService: GenreService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -45,5 +47,12 @@ export class MainPageComponentComponent {
         this.songs = contents.filter(c => c.contentId.startsWith('SONG#'));
         this.albums = contents.filter(c => c.contentId.startsWith('ALBUM#'));
       });
+  }
+
+  viewArtist(contentId: string) {
+    const id = contentId.split('#')[1];
+    if (id) {
+        this.router.navigate(['/artists', id]);
+    }
   }
 }
