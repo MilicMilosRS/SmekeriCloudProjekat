@@ -102,6 +102,30 @@ def handle(event, context):
                 'contentId': f"SONG#{item['id']}",
                 "contentName": item['title']
             })
+        
+        notification_lambda = boto3.client("lambda")
+
+        for artist_id in body.get("artistIds", []):
+            notification_lambda.invoke(
+                FunctionName=os.environ["NOTIFICATION_LAMBDA"],
+                InvocationType="Event",
+                Payload=json.dumps({
+                    "content_id": f"ARTIST#{artist_id}",
+                    "content_name": title
+                })
+            )
+
+        for genre in genres:
+            notification_lambda.invoke(
+                FunctionName=os.environ["NOTIFICATION_LAMBDA"],
+                InvocationType="Event",
+                Payload=json.dumps({
+                    "content_id": f"GENRE#{genre}",
+                    "content_name": title
+                })
+            )
+
+
 
         sqs = boto3.client('sqs')
         queue_url = os.environ['TRANSCRIPTION_QUEUE_URL']

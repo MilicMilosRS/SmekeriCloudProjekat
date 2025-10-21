@@ -18,7 +18,7 @@ from constructs import Construct
 
 class SongStack(Stack):
 
-    def __init__(self, scope: Construct, id: str, core, artist_stack, genre_stack, **kwargs):
+    def __init__(self, scope: Construct, id: str, core, artist_stack, genre_stack,subscriptions_table, notification, **kwargs):
         super().__init__(scope, id, **kwargs)
 
         self.transcription_queue = sqs.Queue(
@@ -26,7 +26,7 @@ class SongStack(Stack):
             queue_name="SongTranscriptionQueue",
             visibility_timeout=Duration.minutes(5)
         )
-        
+
         # Table
         self.song_table = dynamodb.Table(
             self, "SongTable",
@@ -44,6 +44,20 @@ class SongStack(Stack):
             environment={'TABLE_NAME': self.song_table.table_name}
         )
 
+        self.notification_lambda = _lambda.Function(
+            self, "NotificationLambda",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda/notifications"),
+            handler="notify.handle",
+            environment={
+                'SUBSCRIPTIONS_TABLE': subscriptions_table.table_name,
+                'FROM_EMAIL': "mirkodjukic23@gmail.com"
+            },
+            timeout=Duration.seconds(15),
+            memory_size=512
+        )
+
+
         self.lambda_create_song = _lambda.Function(
             self, "CreateSongHandler",
             runtime=_lambda.Runtime.PYTHON_3_9,
@@ -56,8 +70,12 @@ class SongStack(Stack):
                 'GENRE_TABLE': genre_stack.genre_content.table_name,
                 'CLOUDFRONT_URL': core.distribution.domain_name,
                 'BUCKET_NAME': core.bucket.bucket_name,
-                'TRANSCRIPTION_QUEUE_URL': self.transcription_queue.queue_url
-            }
+                'TRANSCRIPTION_QUEUE_URL': self.transcription_queue.queue_url,
+                'NOTIFICATION_LAMBDA': self.notification_lambda.function_name,
+                'SUBSCRIPTIONS_TABLE': subscriptions_table.table_name
+            },
+            timeout=Duration.seconds(20),
+            memory_size=1024
         )
 
         self.lambda_get_details = _lambda.Function(
@@ -109,6 +127,8 @@ class SongStack(Stack):
         self.song_table.grant_read_data(self.lambda_get_songs)
         self.song_table.grant_read_write_data(self.lambda_create_song)
         self.transcription_queue.grant_send_messages(self.lambda_create_song)
+        self.notification_lambda.grant_invoke(self.lambda_create_song)
+        self.transcription_queue.grant_consume_messages(self.lambda_transcribe_song)
         self.song_table.grant_read_data(self.lambda_get_details)
         self.song_table.grant_read_write_data(self.lambda_transcribe_song)
         self.song_table.grant_read_write_data(self.lambda_transcription_complete)
