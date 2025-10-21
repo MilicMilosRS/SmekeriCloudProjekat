@@ -49,7 +49,25 @@ class UserStack(Stack):
             handler="subscribe.handler",
         )
 
+        self.lambda_unsubscribe = _lambda.Function(
+            self, "UnsubscribeHandler",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda/user"),
+            environment={"SUBSCRIBE_TABLE": self.user_subs.table_name},
+            handler="unsubscribe.handler",
+        )
+
+        self.lambda_is_subscribed = _lambda.Function(
+            self, "IsSubscribedHandler",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda/user"),
+            environment={"SUBSCRIBE_TABLE": self.user_subs.table_name},
+            handler="is_subscribed.handler",
+        )
+
         #grants
         self.user_subs.grant_read_data(self.lambda_get_subscriptions)
         self.user_subs.grant_read_write_data(self.lambda_subscribe)
+        self.user_subs.grant_read_write_data(self.lambda_unsubscribe)
+        self.user_subs.grant_read_data(self.lambda_is_subscribed)
         

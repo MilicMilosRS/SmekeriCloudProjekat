@@ -74,6 +74,19 @@ class EndpointStack(Stack):
             "POST", apigw.LambdaIntegration(user_stack.lambda_subscribe),
             authorization_type=apigw.AuthorizationType.COGNITO,
             authorizer=self.authorizer)
+        user_sub_resourse.add_method(
+            "DELETE",
+            apigw.LambdaIntegration(user_stack.lambda_unsubscribe),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=self.authorizer
+        )
+        user_sub_check_resource = user_sub_resourse.add_resource("check")
+        user_sub_check_resource.add_method(
+            "POST",
+            apigw.LambdaIntegration(user_stack.lambda_is_subscribed),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=self.authorizer
+        )
 
         #Notification
         notifications_resource = self.api.root.add_resource("notifications")
