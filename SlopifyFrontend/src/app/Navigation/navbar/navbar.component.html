@@ -1,0 +1,9 @@
+<div class="container">
+    <h1>Slopify</h1>
+    <button *ngIf="!loggedIn" routerLink="/register">Register</button>
+    <button *ngIf="!loggedIn" routerLink="/login">Log in</button>
+
+    <button *ngIf="loggedIn && loggedGroups.includes('users')" routerLink="/subscriptions">Subscriptions</button>
+
+    <button *ngIf="loggedIn" (click)="logout()">Log out</button>
+</div>
