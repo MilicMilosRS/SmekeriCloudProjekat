@@ -7,7 +7,7 @@
           <p>{{ s.name }}</p>
             <div class="buttons">
               <button (click)="viewArtist(s.contentId)" *ngIf="s.contentId.startsWith('ARTIST')" id="view">View</button>
-              <button id="unsub">Unsubscribe</button>
+              <button (click)="unsubscribe(s.contentId)" id="unsub">Unsubscribe</button>
             </div>
         </div>
       </div>
