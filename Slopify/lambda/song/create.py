@@ -78,7 +78,9 @@ def handle(event, context):
             "fileSize": file_size,
             "createdAt": creation_time,
             "updatedAt": modification_time,
-            "duration": duration
+            "duration": duration,
+            "transcription_status": "PENDING",
+            "transcript": ""
         }
         song_table.put_item(Item=item)
 
@@ -101,6 +103,16 @@ def handle(event, context):
                 "contentName": item['title']
             })
 
+        sqs = boto3.client('sqs')
+        queue_url = os.environ['TRANSCRIPTION_QUEUE_URL']
+
+        sqs.send_message(
+            QueueUrl=queue_url,
+            MessageBody=json.dumps({
+                'id': item['id'],
+                's3SongUrl': f"s3://{bucket_name}/{song_filename}"
+            })
+        )
 
         return {'statusCode': 200 }
     except Exception as e:
