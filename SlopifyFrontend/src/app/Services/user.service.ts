@@ -4,6 +4,7 @@ import { env } from '../../env';
 import { SubscribeDTO } from '../DTO/SubscribeDTO';
 import { Observable } from 'rxjs';
 import { UserSubscription } from '../DTO/UserSubscription';
+import { UnsubscribeDTO } from '../DTO/UnsubscribeDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,14 @@ export class UserService {
 
   getSubscription(): Observable<UserSubscription[]> {
     return this.http.get<UserSubscription[]>(`${env.apiUrl}/user/subscriptions`);
+  }
+
+  unsubscribe(data: UnsubscribeDTO) {
+    return this.http.request('DELETE', `${env.apiUrl}/user/subscriptions`, { body: data });
+  }
+
+  isSubscribed(data: UnsubscribeDTO): Observable<{ subscribed: boolean }> {
+    return this.http.post<{subscribed: boolean}>(`${env.apiUrl}/user/subscriptions/check`, data);
   }
 
   test() {

@@ -5,6 +5,9 @@
   <option *ngFor="let g of genres" [value]="g">{{ g }}</option>
 </select>
 
+<button *ngIf="selectedGenre && !isSubbed" (click)="subGenre()" id="subButt">Subscribe to Genre</button>
+<button *ngIf="selectedGenre && isSubbed" (click)="unsubGenre()" id="unsubButt">Unsubscribe from Genre</button>
+
 <div *ngIf="selectedGenre">
   <h3>Artists</h3>
   <table border="1">
