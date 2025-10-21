@@ -17,21 +17,6 @@ class NotificationStack(Stack):
     def __init__(self, scope: Construct, id: str, user_stack, **kwargs):
         super().__init__(scope, id, **kwargs)
 
-        self.subscriptions_table = dynamodb.Table(
-            self, "SubscriptionsTable",
-            table_name="Subscriptions",
-            partition_key=dynamodb.Attribute(
-                name="contentId",
-                type=dynamodb.AttributeType.STRING
-            ),
-            sort_key=dynamodb.Attribute(
-                name="userId",
-                type=dynamodb.AttributeType.STRING
-            ),
-            removal_policy=RemovalPolicy.DESTROY
-        )
-
-
         self.notification_queue = sqs.Queue(
             self, "NotificationQueue",
             visibility_timeout=Duration.seconds(30)
@@ -75,4 +60,3 @@ class NotificationStack(Stack):
 
         CfnOutput(self, "NotificationQueueUrl", value=self.notification_queue.queue_url)
         CfnOutput(self, "NotificationTopicArn", value=self.notification_topic.topic_arn)
-        CfnOutput(self, "SubscriptionsTableName", value=self.subscriptions_table.table_name)

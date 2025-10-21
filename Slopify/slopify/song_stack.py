@@ -20,7 +20,7 @@ from constructs import Construct
 
 class SongStack(Stack):
 
-    def __init__(self, scope: Construct, id: str, core, artist_stack, genre_stack, notification, **kwargs):
+    def __init__(self, scope: Construct, id: str, core, artist_stack, genre_stack, notification_stack, **kwargs):
         super().__init__(scope, id, **kwargs)
 
         self.transcription_queue = sqs.Queue(
@@ -59,7 +59,7 @@ class SongStack(Stack):
                 'CLOUDFRONT_URL': core.distribution.domain_name,
                 'BUCKET_NAME': core.bucket.bucket_name,
                 'TRANSCRIPTION_QUEUE_URL': self.transcription_queue.queue_url,
-                'TOPIC_ARN': notification.notification_topic.topic_arn,
+                'TOPIC_ARN': notification_stack.notification_topic.topic_arn,
             },
             timeout=Duration.seconds(20),
             memory_size=1024

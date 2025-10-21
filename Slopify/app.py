@@ -18,7 +18,7 @@ genre = GenreStack(app, "GenreStack", core=core)
 artist = ArtistStack(app, "ArtistStack", core=core, genre_stack=genre)
 user = UserStack(app, "UserStack")
 notification = NotificationStack(app,"NotificationStack", user_stack=user)
-song = SongStack(app, "SongStack", core=core, artist_stack=artist, genre_stack=genre, notification=notification)
+song = SongStack(app, "SongStack", core=core, artist_stack=artist, genre_stack=genre, notification_stack=notification)
 album = AlbumStack(app, "AlbumStack")
 endpoint = EndpointStack(app, "EndpointStack", song_stack=song, artist_stack=artist, genre_stack=genre, user_stack=user, auth_stack=auth, notification_stack=notification)
 
