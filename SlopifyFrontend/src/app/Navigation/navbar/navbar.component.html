@@ -5,6 +5,8 @@
 
     <button *ngIf="loggedIn" routerLink="/subscriptions">Subscriptions</button>
     <!--<button *ngIf="loggedIn && loggedGroups.includes('users')" routerLink="/subscriptions">Subscriptions</button>-->
+    <button *ngIf="loggedIn && loggedGroups.includes('admins')" routerLink="/songs/new">Create song</button>
+    <button *ngIf="loggedIn && loggedGroups.includes('admins')" routerLink="/artists/new">Create artist</button>
 
     <button *ngIf="loggedIn" (click)="logout()">Log out</button>
 </div>
