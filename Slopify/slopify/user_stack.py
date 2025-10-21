@@ -12,21 +12,20 @@ class UserStack(Stack):
     def __init__(self, scope: Construct, id: str, **kwargs):
         super().__init__(scope, id, **kwargs)
 
-        #Table
+        #table
         self.user_subs = dynamodb.Table(
             self, "UserSubscriptionsTable",
             table_name="UserSubscriptions",
             partition_key=dynamodb.Attribute(name="userId", type=dynamodb.AttributeType.STRING),
             sort_key=dynamodb.Attribute(name="contentId", type=dynamodb.AttributeType.STRING),
             removal_policy=RemovalPolicy.DESTROY )
-        
         self.user_subs.add_global_secondary_index(
             index_name="ContentIdIndex",
             partition_key=dynamodb.Attribute(name="contentId", type=dynamodb.AttributeType.STRING),
             sort_key=dynamodb.Attribute(name="userId", type=dynamodb.AttributeType.STRING),
             )
         
-        #Lambdas
+        #lambdas
         self.lambda_get_user_data = _lambda.Function(
             self, "GetUserDataHandler",
             runtime=_lambda.Runtime.PYTHON_3_9,
@@ -50,7 +49,7 @@ class UserStack(Stack):
             handler="subscribe.handler",
         )
 
-        #Grants
+        #grants
         self.user_subs.grant_read_data(self.lambda_get_subscriptions)
         self.user_subs.grant_read_write_data(self.lambda_subscribe)
         

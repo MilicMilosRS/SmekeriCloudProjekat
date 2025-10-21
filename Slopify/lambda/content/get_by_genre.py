@@ -26,4 +26,12 @@ def handle(event, context):
             "name": item.get("contentName", ""),
             } for item in items]
 
-    return {'statusCode': 200, 'body': json.dumps(res)}
+    return {
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type,Authorization",
+            "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE"
+            },
+        'statusCode': 200,
+        'body': json.dumps(res)
+        }
