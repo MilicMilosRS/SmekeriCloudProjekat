@@ -4,11 +4,12 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GenreService } from '../../Services/genre.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-main-page-component',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './main-page-component.component.html',
   styleUrl: './main-page-component.component.css'
 })

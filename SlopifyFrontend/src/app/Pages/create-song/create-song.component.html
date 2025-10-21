@@ -13,8 +13,8 @@
   <button type="button" (click)="addArtist()">Add</button><br>
 
   <ul>
-    <li *ngFor="let artistId of song.artistIds">
-      {{artistId}} <button type="button" (click)="removeArtist(artistId)">Remove</button>
+    <li *ngFor="let a of selectedArtists">
+      {{a.name}} <button type="button" (click)="removeArtist(a.id)">Remove</button>
     </li>
   </ul><br>
 
