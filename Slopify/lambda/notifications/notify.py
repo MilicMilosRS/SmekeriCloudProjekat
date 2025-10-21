@@ -16,8 +16,9 @@ def handle(event, context):
         # body = json.loads(record['body'])
         # content_id = body['content_id']
         # content_name = body.get('content_name', 'New content')
-        content_id = 'ARTIST#6b417897-fcb0-453a-815b-4f6d770e5f72'
-        content_name = 'Mirzina jetra'
+        content_id = event['content_id']
+        content_name = event['content_name']
+
 
         if content_id.startswith("SONG#"):
             content_type = "song"
