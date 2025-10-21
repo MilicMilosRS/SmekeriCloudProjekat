@@ -1,1 +1,15 @@
-<p>user-subscriptions-page works!</p>
+<div class="container">
+  <div *ngIf="subscriptions.length > 0">
+    <h2>Your Subscriptions</h2>
+      <div class="cardsContainer">
+        <div class="subCard" *ngFor="let s of subscriptions">
+          <p>({{ s.contentId.split("#")[0] }})</p>
+          <p>{{ s.name }}</p>
+            <div class="buttons">
+              <button (click)="viewArtist(s.contentId)" *ngIf="s.contentId.startsWith('ARTIST')" id="view">View</button>
+              <button id="unsub">Unsubscribe</button>
+            </div>
+        </div>
+      </div>
+  </div>
+</div>

@@ -9,6 +9,7 @@
   <h3>Artists</h3>
   <table border="1">
     <tr *ngFor="let a of artists">
+      <td>{{ a.name }}</td>
       <td><a [routerLink]="['/artists', a.contentId.split('#')[1]]">{{ a.name }}</a></td>
     </tr>
   </table>

@@ -6,6 +6,7 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_dynamodb as dynamodb,
     aws_s3 as s3,
+    aws_iam as iam,
     aws_s3_notifications as s3n,
     aws_apigateway as apigw,
     aws_iam as iam,
@@ -95,9 +96,7 @@ class SongStack(Stack):
             memory_size=1024
         )
 
-        self.lambda_transcribe_song.add_event_source(
-            lambda_event_sources.SqsEventSource(self.transcription_queue)
-        )
+
         #Transcription completion
         self.lambda_transcription_complete= _lambda.Function(
             self,"TranscriptionCompleteHandler",
@@ -114,6 +113,26 @@ class SongStack(Stack):
         )
 
 
+
+        self.transcription_queue.grant_consume_messages(self.lambda_transcribe_song)
+
+        self.lambda_transcribe_song.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=[
+                    "transcribe:*",
+                    "s3:GetObject",
+                    "s3:PutObject",
+                    "sqs:ReceiveMessage",
+                    "sqs:DeleteMessage",
+                    "sqs:GetQueueAttributes"
+                ],
+                resources=["*"]
+            )
+        )
+
+        self.lambda_transcribe_song.add_event_source(
+            lambda_event_sources.SqsEventSource(self.transcription_queue)
+        )
 
         # Grants
         self.song_table.grant_read_data(self.lambda_get_songs)

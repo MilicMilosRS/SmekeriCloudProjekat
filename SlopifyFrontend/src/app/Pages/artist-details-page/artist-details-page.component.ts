@@ -38,7 +38,7 @@ export class ArtistDetailsPageComponent implements OnInit{
     })
   }
 
-  srbine(){
+  subscribeToArtist(){
     if(this.artistId == null)
       return;
 
@@ -51,6 +51,7 @@ export class ArtistDetailsPageComponent implements OnInit{
       error: (error) => {console.log(error)}
     })
   }
+
   testSubscription() {
   this.userService.test().subscribe({
     next: (res) => console.log('Test trigger successful', res),

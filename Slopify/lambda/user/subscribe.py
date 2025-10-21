@@ -14,6 +14,7 @@ def handler(event, context):
         claims = event.get('requestContext', {}).get('authorizer', {}).get('claims', {})
         email = claims.get('email')
         
+        #parsing json
         body_raw = event.get("body", "{}")
         if isinstance(body_raw, dict):
             body = body_raw
@@ -32,6 +33,7 @@ def handler(event, context):
                     }
                 }
 
+        #checking if subscription already exists
         response = user_subscriptions_table.query(
                 KeyConditionExpression=Key('userId').eq(email) &
                                      Key('contentId').eq(contentType + "#" + contentId))
