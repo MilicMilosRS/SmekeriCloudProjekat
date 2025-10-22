@@ -4,7 +4,10 @@ import boto3
 from boto3.dynamodb.conditions import Key
 
 dynamodb = boto3.resource("dynamodb")
-song_table = dynamodb.Table(os.environ["SONG_TABLE"])
+GSI_NAME = 'ContentTypeIndex'
+albums_table = dynamodb.Table(os.environ["ALBUMS_TABLE"])
+album_songs_table = dynamodb.Table(os.environ["ALBUM_SONGS_TABLE"])
+genre_content_table = dynamodb.Table(os.environ["GENRE_CONTENT_TABLE"])
 
 def handle(event, context):
     try:
@@ -19,7 +22,7 @@ def handle(event, context):
                     }
                 }
 
-        response = song_table.get_item(Key={'id': contentId})
+        response = albums_table.get_item(Key={'id': contentId})
         item = response.get("Item", None)
         if not item:
             return {"statusCode": 404,
@@ -30,13 +33,26 @@ def handle(event, context):
                 }
             }
 
+        genre_res = genre_content_table.query(
+            IndexName=GSI_NAME,
+            KeyConditionExpression=Key('contentId').eq("ALBUM#" + contentId),
+            ProjectionExpression="genreName"
+        )
+
+        items = genre_res.get('Items', [])
+        genres = list({item['genreName'] for item in items})
+
+        songs_res = album_songs_table.query(
+            KeyConditionExpression=Key('albumId').eq(contentId),
+        )
+        print(songs_res.get('Items'))
+        songs = [{'name': s.get('songName'), 'contentId': s.get('songId')} for s in songs_res.get('Items',[])]
+
         ret = {
             'id': item.get('id', ''),
             'title': item.get('title', ''),
-            'transcript': item.get('transcript', ''),
-            's3SongUrl': "https://" + item.get('s3SongUrl', ''),
-            's3ImageUrl': "https://" + item.get('s3ImageUrl', ''),
-            'createdAt': item.get('createdAt', ''),
+            'genres': genres,
+            'songs': songs
         }
 
         return {"statusCode": 200,

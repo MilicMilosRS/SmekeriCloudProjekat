@@ -49,8 +49,26 @@ class AlbumStack(Stack):
             }
         )
 
+        self.lambda_get_details = _lambda.Function(
+            self, "GetAlbumDetailsHandler",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda/album"),
+            handler="get_details.handle",
+            environment={
+                "GENRE_CONTENT_TABLE": genre_stack.genre_content.table_name,
+                "ALBUMS_TABLE": self.album_table.table_name,
+                "ALBUM_SONGS_TABLE": self.album_songs_table.table_name,
+                "SONG_TABLE": song_stack.song_table.table_name
+            }
+        )
+
         genre_stack.genres_table.grant_read_write_data(self.lambda_create_album)
         genre_stack.genre_content.grant_read_write_data(self.lambda_create_album)
         self.album_table.grant_read_write_data(self.lambda_create_album)
         self.album_songs_table.grant_read_write_data(self.lambda_create_album)
         song_stack.song_table.grant_read_data(self.lambda_create_album)
+
+        genre_stack.genre_content.grant_read_data(self.lambda_get_details)
+        self.album_table.grant_read_data(self.lambda_get_details)
+        self.album_songs_table.grant_read_data(self.lambda_get_details)
+        song_stack.song_table.grant_read_data(self.lambda_get_details)

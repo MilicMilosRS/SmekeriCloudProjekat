@@ -1,1 +1,28 @@
-<p>album-details-page works!</p>
+<h2>Album Details</h2>
+
+<div *ngIf="!details || !details.id">
+  <p>Loading album details...</p>
+</div>
+
+<div *ngIf="details && details.id">
+  <h3>{{ details.name }}</h3>
+  <p><strong>Album ID:</strong> {{ details.id }}</p>
+
+  <h4>Genres:</h4>
+  <div *ngIf="details.genres.length === 0">
+    <p>No genres available.</p>
+  </div>
+  <ul *ngIf="details.genres.length > 0">
+    <li *ngFor="let genre of details.genres">{{ genre }}</li>
+  </ul>
+
+  <h4>Songs:</h4>
+  <div *ngIf="details.songs.length === 0">
+    <p>No songs in this album.</p>
+  </div>
+  <ul *ngIf="details.songs.length > 0">
+    <li *ngFor="let song of details.songs">
+      <a [routerLink]="['/songs', song.contentId]">{{ song.name }}</a>
+    </li>
+  </ul>
+</div>
