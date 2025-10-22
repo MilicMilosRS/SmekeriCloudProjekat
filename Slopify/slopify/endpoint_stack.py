@@ -105,6 +105,8 @@ class EndpointStack(Stack):
         #Albums
         albums_resource = self.api.root.add_resource("albums")
         albums_resource.add_method("POST", apigw.LambdaIntegration(album_stack.lambda_create_album))
+        albums_id_resource = albums_resource.add_resource("{id}")
+        albums_id_resource.add_method("GET", apigw.LambdaIntegration(album_stack.lambda_get_details))
 
         #Notification
         notifications_resource = self.api.root.add_resource("notifications")

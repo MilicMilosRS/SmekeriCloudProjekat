@@ -85,7 +85,7 @@ def handle(event, context):
         for genre in genres:
             try:
                 genre_content_table.put_item(Item={
-                    'contentId': 'ALBUM#{albumId}',
+                    'contentId': f"ALBUM#{albumId}",
                     'contentName': name,
                     'genreName': genre
                 })
