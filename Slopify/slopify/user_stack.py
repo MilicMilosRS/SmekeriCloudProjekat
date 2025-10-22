@@ -25,6 +25,14 @@ class UserStack(Stack):
             sort_key=dynamodb.Attribute(name="userId", type=dynamodb.AttributeType.STRING),
             )
         
+        self.user_grades = dynamodb.Table(
+            self, "UserGradesTable",
+            table_name="UserGrades",
+            partition_key=dynamodb.Attribute(name="userId", type=dynamodb.AttributeType.STRING),
+            sort_key=dynamodb.Attribute(name="contentId", type=dynamodb.AttributeType.STRING),
+            removal_policy=RemovalPolicy.DESTROY
+        )
+        
         #lambdas
         self.lambda_get_user_data = _lambda.Function(
             self, "GetUserDataHandler",
@@ -65,9 +73,27 @@ class UserStack(Stack):
             handler="is_subscribed.handler",
         )
 
+        self.lambda_get_grade = _lambda.Function(
+            self, "GetGradeHandler",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda/user"),
+            environment={"GRADE_TABLE": self.user_grades.table_name},
+            handler="get_grade.handler",
+        )
+        self.lambda_set_grade = _lambda.Function(
+            self, "SetGradeHandler",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda/user"),
+            environment={"GRADE_TABLE": self.user_grades.table_name},
+            handler="set_grade.handler",
+        )
+
         #grants
         self.user_subs.grant_read_data(self.lambda_get_subscriptions)
         self.user_subs.grant_read_write_data(self.lambda_subscribe)
         self.user_subs.grant_read_write_data(self.lambda_unsubscribe)
         self.user_subs.grant_read_data(self.lambda_is_subscribed)
+
+        self.user_grades.grant_read_data(self.lambda_get_grade)
+        self.user_grades.grant_read_write_data(self.lambda_set_grade)
         

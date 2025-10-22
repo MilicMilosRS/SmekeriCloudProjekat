@@ -88,6 +88,20 @@ class EndpointStack(Stack):
             authorizer=self.authorizer
         )
 
+        grades_resource = self.api.root.add_resource("grades")
+        grades_resource.add_method(
+            "POST",
+            apigw.LambdaIntegration(user_stack.lambda_set_grade),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=self.authorizer
+        )
+        grades_resource.add_method(
+            "GET",
+            apigw.LambdaIntegration(user_stack.lambda_get_grade),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=self.authorizer
+        )
+
         #Albums
         albums_resource = self.api.root.add_resource("albums")
         albums_resource.add_method("POST", apigw.LambdaIntegration(album_stack.lambda_create_album))
