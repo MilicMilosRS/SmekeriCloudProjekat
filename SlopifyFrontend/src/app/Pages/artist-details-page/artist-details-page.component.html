@@ -22,4 +22,13 @@
     </select>
     <button (click)="submitGrade()">Confirm grade</button>
 </div>
+<div *ngIf="details.songs && details.songs.length > 0">
+  <h3>Songs:</h3>
+  <ul>
+    <li *ngFor="let song of details.songs">
+      <img *ngIf="song.s3ImageUrl" [src]="song.s3ImageUrl" width="50" height="50" style="margin-right: 8px;">
+      <a [routerLink]="['/songs', song.songId]">{{ song.songName }}</a>
+    </li>
+  </ul>
+</div>
 <div *ngIf="grade">You gave this album grade: {{ grade }}</div>

@@ -63,13 +63,15 @@ class ArtistStack(Stack):
             handler="get_details.handle",
             environment={
                 'ARTIST_TABLE': self.artist_table.table_name,
-                'GENRE_TABLE': genre_stack.genre_content.table_name
+                'GENRE_TABLE': genre_stack.genre_content.table_name,
+                'ARTIST_SONGS_TABLE': self.artist_songs.table_name
             }
         )
 
         self.artist_table.grant_read_write_data(self.lambda_create_artist)
         self.artist_table.grant_read_data(self.lambda_get_artist_details)
         self.artist_table.grant_read_data(self.lambda_get_all_artists)
-        
+        self.artist_songs.grant_read_data(self.lambda_get_artist_details)
+
         genre_stack.genre_content.grant_read_data(self.lambda_get_artist_details)
         genre_stack.genre_content.grant_read_write_data(self.lambda_create_artist)
