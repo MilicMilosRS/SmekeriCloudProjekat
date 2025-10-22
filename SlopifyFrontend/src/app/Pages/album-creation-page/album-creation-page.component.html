@@ -1,0 +1,43 @@
+<h2>Create New Album</h2>
+
+<div>
+  <label for="albumName">Album Name:</label>
+  <input
+    id="albumName"
+    type="text"
+    [(ngModel)]="album.name"
+    placeholder="Enter album name"
+  />
+</div>
+
+<br />
+
+<div>
+  <label for="songSelect">Select Song:</label>
+  <select id="songSelect" [(ngModel)]="selectedSongId">
+    <option value="">-- Choose a song --</option>
+    <option *ngFor="let song of songs" [value]="song.id">
+      {{ song.title }}
+    </option>
+  </select>
+  <button (click)="addSong()">Add Song</button>
+</div>
+
+<br />
+
+<h3>Selected Songs</h3>
+
+<div *ngIf="album.songIds.length === 0">
+  <p>No songs added yet.</p>
+</div>
+
+<ul>
+  <li *ngFor="let songId of album.songIds">
+    <a [routerLink]="['songs', songId]">{{ getSongTitle(songId) }}</a>
+    <button (click)="removeSong(songId)">Remove</button>
+  </li>
+</ul>
+
+<br />
+
+<button (click)="createAlbum()">Create Album</button>

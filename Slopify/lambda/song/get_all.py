@@ -16,4 +16,10 @@ def get_all(event, context):
             "songUrl": item["s3SongUrl"]
             } for item in items]
 
-    return {'statusCode': 200, 'body': json.dumps(res)}
+    return {'statusCode': 200,
+            "headers": {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "Content-Type,Authorization",
+                    "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE"
+                },
+            'body': json.dumps(res)}
