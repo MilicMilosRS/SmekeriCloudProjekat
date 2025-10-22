@@ -6,11 +6,13 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../../Services/user.service';
 import { SubscribeDTO } from '../../DTO/SubscribeDTO';
 import { UnsubscribeDTO } from '../../DTO/UnsubscribeDTO';
+import { GradeDTO } from '../../DTO/GradeDTO';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-artist-details-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './artist-details-page.component.html',
   styleUrl: './artist-details-page.component.css'
 })
@@ -26,6 +28,9 @@ export class ArtistDetailsPageComponent implements OnInit{
 
   //subscription
   isSubbed = false;
+  //grades
+  grade: number = 0;
+  selectedGrade: number = 1;
 
   ngOnInit(): void {
     this.artistId = this.route.snapshot.paramMap.get('id');
@@ -35,6 +40,10 @@ export class ArtistDetailsPageComponent implements OnInit{
         next: (data) => {
           this.isSubbed = data.subscribed;
         }
+      });
+    if(this.artistId)
+      this.userService.getGrade('ARTIST', this.artistId).subscribe({
+        next: (data) => {this.grade = data.grade}
       });
   }
 
@@ -72,6 +81,24 @@ export class ArtistDetailsPageComponent implements OnInit{
       next: (value) => this.isSubbed = false
     })
   }
+
+  submitGrade() {
+      if (this.artistId == null) return;
+  
+      const gradeDTO: GradeDTO = {
+        contentId: this.artistId,
+        contentType: 'ARTIST',
+        grade: Number(this.selectedGrade)
+      };
+  
+      this.userService.setGrade(gradeDTO).subscribe({
+        next: (data) => {
+          this.grade = this.selectedGrade;
+          console.log('Grade submitted successfully');
+        },
+        error: (err) => console.error('Error submitting grade:', err)
+        });
+    }
 
   /*testSubscription() {
   this.userService.test().subscribe({

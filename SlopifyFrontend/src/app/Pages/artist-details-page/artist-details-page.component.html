@@ -14,3 +14,12 @@
     <li *ngFor="let genre of details.genres">{{ genre }}</li>
   </ul>
 </div>
+
+<div *ngIf="!grade">
+    <p>Give album a grade:</p>
+    <select [(ngModel)]="selectedGrade" name="grades">
+      <option *ngFor="let g of [1, 2, 3, 4, 5]" [value]="g">{{ g }}</option>
+    </select>
+    <button (click)="submitGrade()">Confirm grade</button>
+</div>
+<div *ngIf="grade">You gave this album grade: {{ grade }}</div>

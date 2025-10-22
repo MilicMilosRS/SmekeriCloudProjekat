@@ -5,6 +5,7 @@ import { SubscribeDTO } from '../DTO/SubscribeDTO';
 import { Observable } from 'rxjs';
 import { UserSubscription } from '../DTO/UserSubscription';
 import { UnsubscribeDTO } from '../DTO/UnsubscribeDTO';
+import { GradeDTO } from '../DTO/GradeDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +32,14 @@ export class UserService {
 
   isSubscribed(data: UnsubscribeDTO): Observable<{ subscribed: boolean }> {
     return this.http.post<{subscribed: boolean}>(`${env.apiUrl}/user/subscriptions/check`, data);
+  }
+
+  getGrade(contentType: string, contentId: string): Observable<{ grade: number }> {
+    return this.http.get<{grade: number}>(`${env.apiUrl}/grades`, {params: { contentType: contentType, contentId: contentId }});
+  }
+
+  setGrade(data: GradeDTO): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${env.apiUrl}/grades`, data);
   }
 
   test() {

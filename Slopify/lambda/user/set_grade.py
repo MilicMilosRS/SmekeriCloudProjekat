@@ -6,7 +6,7 @@ from boto3.dynamodb.conditions import Key
 dynamodb = boto3.resource("dynamodb")
 grade_table = dynamodb.Table(os.environ["GRADE_TABLE"])
 
-ALLOWED_CONTENT_TYPES = {"ARTIST", "GENRE", "SONG", "ALBUM"}
+ALLOWED_CONTENT_TYPES = {"ARTIST", "SONG", "ALBUM"}
 
 def handler(event, context):
     try:

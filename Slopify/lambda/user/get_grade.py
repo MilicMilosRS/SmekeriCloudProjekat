@@ -13,11 +13,9 @@ def handler(event, context):
         if not email:
             return _response(401, {"error": "Unauthorized"})
 
-        body_raw = event.get("body", "{}")
-        body = json.loads(body_raw) if isinstance(body_raw, str) else body_raw
-
-        contentType = body.get("contentType", "")
-        contentId = body.get("contentId", "")
+        params = event.get("queryStringParameters") or {}
+        contentType = params.get("contentType", "")
+        contentId = params.get("contentId", "")
 
         if not (contentType and contentId):
             return _response(400, {"error": "Missing contentType or contentId"})
@@ -34,7 +32,7 @@ def handler(event, context):
             return _response(200, {"grade": 0})
 
         grade = items[0].get("grade", 0)
-        return _response(200, {"grade": grade})
+        return _response(200, {"grade": int(grade)})
 
     except Exception as e:
         import traceback
