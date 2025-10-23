@@ -40,7 +40,11 @@ class EndpointStack(Stack):
         #Songs
         songs_resource = self.api.root.add_resource("songs")
         songs_resource.add_method("GET", apigw.LambdaIntegration(song_stack.lambda_get_songs))
-        songs_resource.add_method("POST", apigw.LambdaIntegration(song_stack.lambda_create_song))
+        songs_resource.add_method("POST",
+            apigw.LambdaIntegration(song_stack.lambda_create_song),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=self.authorizer
+            )
         songs_id_resource = songs_resource.add_resource("{id}")
         songs_id_resource.add_method(
             "GET", apigw.LambdaIntegration(song_stack.lambda_get_details),                         
@@ -59,7 +63,11 @@ class EndpointStack(Stack):
         #Artists
         artists_resource = self.api.root.add_resource("artists")
         artists_resource.add_method("GET", apigw.LambdaIntegration(artist_stack.lambda_get_all_artists))
-        artists_resource.add_method("POST", apigw.LambdaIntegration(artist_stack.lambda_create_artist))
+        artists_resource.add_method("POST",
+            apigw.LambdaIntegration(artist_stack.lambda_create_artist),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=self.authorizer
+            )
         artists_id_resource = artists_resource.add_resource("{id}")
         artists_id_resource.add_method("GET", apigw.LambdaIntegration(artist_stack.lambda_get_artist_details))
 
@@ -116,7 +124,11 @@ class EndpointStack(Stack):
 
         #Albums
         albums_resource = self.api.root.add_resource("albums")
-        albums_resource.add_method("POST", apigw.LambdaIntegration(album_stack.lambda_create_album))
+        albums_resource.add_method(
+            "POST", apigw.LambdaIntegration(album_stack.lambda_create_album),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=self.authorizer
+            )
         albums_id_resource = albums_resource.add_resource("{id}")
         albums_id_resource.add_method("GET", apigw.LambdaIntegration(album_stack.lambda_get_details))
 

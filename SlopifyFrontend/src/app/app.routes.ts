@@ -21,7 +21,7 @@ export const routes: Routes = [
     {path:'artists/:id', component: ArtistDetailsPageComponent},
     {path:'albums/new', component: AlbumCreationPageComponent},
     {path:'albums/:id', component: AlbumDetailsPageComponent},
-    {path:'user/feed', component: UserFeedPageComponent},
-    {path:'', component: MainPageComponentComponent},
+    {path:'discover', component: MainPageComponentComponent},
+    {path:'', component: UserFeedPageComponent},
     {path:'subscriptions', component: UserSubscriptionsPageComponent}
 ];

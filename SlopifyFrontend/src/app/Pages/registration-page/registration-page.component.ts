@@ -17,7 +17,20 @@ export class RegistrationPageComponent {
   constructor(private authService: AuthService) {}
 
   async register() {
-    const success = await this.authService.registerUser(this.registrationData);
-    this.message = success ? 'Registration successful!' : 'Registration failed!';
+    const today = new Date();
+    const birthDate = new Date(this.registrationData.birthDate);
+
+    if (birthDate >= today) {
+      this.message = 'Birthday must be in the past!';
+      return;
+    }
+
+    try {
+      const success = await this.authService.registerUser(this.registrationData);
+      this.message = success ? 'Registration successful!' : 'Registration failed!';
+    } catch (err) {
+      this.message = 'Registration failed!';
+      console.error(err);
   }
+}
 }

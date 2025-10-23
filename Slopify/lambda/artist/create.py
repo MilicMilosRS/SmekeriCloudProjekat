@@ -19,6 +19,19 @@ genres: [name1, name2...],
 """
 def handle(event, context):
     try:
+        claims = event.get('requestContext', {}).get('authorizer', {}).get('claims', {})
+        groups = claims.get('cognito:groups', '')
+        if "admins" not in groups.split(' '):
+            return {
+                'statusCode': 403,
+                "headers": {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "Content-Type,Authorization",
+                    "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE"
+                },
+                'body':json.dumps({'error': 'Only admin can do that!'})}
+            
+
         print("event loaded")
         body_raw = event.get("body", "{}")
         if isinstance(body_raw, dict):
@@ -32,7 +45,14 @@ def handle(event, context):
         genres = [g.strip().upper() for g in body.get("genres", [])]
         
         if not(name and bio and genres):
-            return {'statusCode': 400, 'body':json.dumps({'error': 'Missing name bio or genres'})}
+            return {
+                'statusCode': 400,
+                "headers": {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "Content-Type,Authorization",
+                    "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE"
+                },
+                'body':json.dumps({'error': 'Missing name bio or genres'})}
 
         print(body)
         print(genres)

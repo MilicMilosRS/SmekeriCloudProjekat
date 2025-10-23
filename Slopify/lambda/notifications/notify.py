@@ -23,7 +23,7 @@ def handle(event, context):
             song_id = body.get('song_id', '')
             song_name = body.get('song_name', '')
 
-
+            content_type = ""
             if content_id.startswith("SONG#"):
                 content_type = "song"
             elif content_id.startswith("ARTIST#"):
@@ -46,20 +46,24 @@ def handle(event, context):
             for user in subscribers:
                 email = user.get('userId')
                 if email:
-                    ses.send_email(
-                        Source=FROM_EMAIL,
-                        Destination={"ToAddresses": [email]},
-                        Message={
-                            "Subject": {
-                                "Data": f"New slop-drop: {content_type.title()}"
-                            },
-                            "Body": {
-                                "Text": {
-                                    "Data": f"New content drop for You!\n\nNew {content_type} content published: {content_name}!"
+                    try:
+                        ses.send_email(
+                            Source=FROM_EMAIL,
+                            Destination={"ToAddresses": [email]},
+                            Message={
+                                "Subject": {
+                                    "Data": f"New slop-drop: {content_type.title()}"
+                                },
+                                "Body": {
+                                    "Text": {
+                                        "Data": f"New content drop for You!\n\nNew {content_type} content published: {content_name}!"
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                    except:
+                        pass
+
         return {
             "statusCode": 200,
             "headers": {

@@ -3,6 +3,7 @@
     <button *ngIf="!loggedIn" routerLink="/register">Register</button>
     <button *ngIf="!loggedIn" routerLink="/login">Log in</button>
 
+    <button *ngIf="loggedIn" routerLink="/discover">Discover</button>
     <button *ngIf="loggedIn" routerLink="/subscriptions">Subscriptions</button>
     <!--<button *ngIf="loggedIn && loggedGroups.includes('users')" routerLink="/subscriptions">Subscriptions</button>-->
     <button *ngIf="loggedIn && loggedGroups.includes('admins')" routerLink="/songs/new">Create song</button>

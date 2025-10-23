@@ -29,6 +29,19 @@ imageData
 """
 def handle(event, context):
     try:
+        claims = event.get('requestContext', {}).get('authorizer', {}).get('claims', {})
+        groups = claims.get('cognito:groups', '')
+        print(groups)
+        if "admins" not in groups.split(' '):
+            return {
+                'statusCode': 403,
+                "headers": {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "Content-Type,Authorization",
+                    "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE"
+                },
+                'body':json.dumps({'error': 'Only admin can do that!'})}
+        
         print("event loaded")
         body_raw = event.get("body", "{}")
         if isinstance(body_raw, dict):
@@ -152,5 +165,10 @@ def handle(event, context):
         traceback.print_exc()
         return {
             'statusCode': 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type,Authorization",
+                "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE"
+            },
             'body': json.dumps({'error': str(e)})
         }
