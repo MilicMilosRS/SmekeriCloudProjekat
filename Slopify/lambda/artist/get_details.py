@@ -6,6 +6,7 @@ from boto3.dynamodb.conditions import Key
 dynamodb = boto3.resource("dynamodb")
 artist_table = dynamodb.Table(os.environ["ARTIST_TABLE"])
 genre_table = dynamodb.Table(os.environ["GENRE_TABLE"])
+artist_songs_table = dynamodb.Table(os.environ["ARTIST_SONGS_TABLE"])
 GSI_NAME = 'ContentTypeIndex'
 
 #Body contains {contentId, contentType}
@@ -43,11 +44,24 @@ def handle(event, context):
         items = genre_res.get('Items', [])
         genres = list({item['genreName'] for item in items})
 
+        songs_res = artist_songs_table.query(
+            KeyConditionExpression=Key('artistId').eq(contentId)
+        )
+
+        songs = [
+            {
+                "songId": s["songId"],
+                "songName": s.get("songName",""),
+                "s3ImageUrl": s.get("s3ImageUrl","")
+            }
+            for s in songs_res.get("Items",[])
+        ]
         ret = {
             'id': item.get('id', ''),
             'name': item.get('name', ''),
             'bio': item.get('bio', ''),
-            'genres': genres
+            'genres': genres,
+            'songs':songs
         }
 
         return {"statusCode": 200,

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ArtistService } from '../../Services/artist.service';
 import { ArtistDetailsDTO } from '../../DTO/ArtistDetails';
 import { CommonModule } from '@angular/common';
@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-artist-details-page',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './artist-details-page.component.html',
   styleUrl: './artist-details-page.component.css'
 })
