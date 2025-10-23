@@ -2,9 +2,11 @@ import json
 import os
 import boto3
 from boto3.dynamodb.conditions import Key
+import datetime
 
 dynamodb = boto3.resource("dynamodb")
 song_table = dynamodb.Table(os.environ["SONG_TABLE"])
+user_history_table = dynamodb.Table(os.environ["HISTORY_TABLE"])
 
 def handle(event, context):
     try:
@@ -38,6 +40,12 @@ def handle(event, context):
             's3ImageUrl': "https://" + item.get('s3ImageUrl', ''),
             'createdAt': item.get('createdAt', ''),
         }
+
+        user_history_table.put_item(Item={
+            'userEmail': event['requestContext']['authorizer']['claims']['email'],
+            'songId': ret['id'],
+            'timestamp': datetime.datetime.now(datetime.timezone.utc).isoformat()
+        })
 
         return {"statusCode": 200,
             "headers": {

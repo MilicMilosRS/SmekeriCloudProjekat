@@ -42,7 +42,11 @@ class EndpointStack(Stack):
         songs_resource.add_method("GET", apigw.LambdaIntegration(song_stack.lambda_get_songs))
         songs_resource.add_method("POST", apigw.LambdaIntegration(song_stack.lambda_create_song))
         songs_id_resource = songs_resource.add_resource("{id}")
-        songs_id_resource.add_method("GET", apigw.LambdaIntegration(song_stack.lambda_get_details))
+        songs_id_resource.add_method(
+            "GET", apigw.LambdaIntegration(song_stack.lambda_get_details),                         
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=self.authorizer
+            )
 
         #content
         contents_resource = self.api.root.add_resource("contents")

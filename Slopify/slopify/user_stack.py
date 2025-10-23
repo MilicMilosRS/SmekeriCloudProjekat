@@ -18,6 +18,7 @@ class UserStack(Stack):
             table_name="UserSubscriptions",
             partition_key=dynamodb.Attribute(name="userId", type=dynamodb.AttributeType.STRING),
             sort_key=dynamodb.Attribute(name="contentId", type=dynamodb.AttributeType.STRING),
+            stream=dynamodb.StreamViewType.NEW_AND_OLD_IMAGES,
             removal_policy=RemovalPolicy.DESTROY )
         self.user_subs.add_global_secondary_index(
             index_name="ContentIdIndex",
@@ -30,6 +31,7 @@ class UserStack(Stack):
             table_name="UserGrades",
             partition_key=dynamodb.Attribute(name="userId", type=dynamodb.AttributeType.STRING),
             sort_key=dynamodb.Attribute(name="contentId", type=dynamodb.AttributeType.STRING),
+            stream=dynamodb.StreamViewType.NEW_AND_OLD_IMAGES,
             removal_policy=RemovalPolicy.DESTROY
         )
         

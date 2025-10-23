@@ -34,6 +34,16 @@ class SongStack(Stack):
             self, "SongTable",
             table_name="Songs",
             partition_key=dynamodb.Attribute(name="id", type=dynamodb.AttributeType.STRING),
+            stream=dynamodb.StreamViewType.NEW_IMAGE,
+            removal_policy=RemovalPolicy.DESTROY
+        )
+
+        self.listening_history = dynamodb.Table(
+            self, "UserListeningTable",
+            table_name="UserListeningHistory",
+            partition_key=dynamodb.Attribute(name="userEmail", type=dynamodb.AttributeType.STRING),
+            sort_key=dynamodb.Attribute(name="songId", type=dynamodb.AttributeType.STRING),
+            stream=dynamodb.StreamViewType.NEW_IMAGE,
             removal_policy=RemovalPolicy.DESTROY
         )
 
@@ -43,7 +53,9 @@ class SongStack(Stack):
             runtime=_lambda.Runtime.PYTHON_3_9,
             code=_lambda.Code.from_asset("lambda/song"),
             handler="get_all.get_all",
-            environment={'TABLE_NAME': self.song_table.table_name}
+            environment={
+                'TABLE_NAME': self.song_table.table_name,
+                }
         )
 
         self.lambda_create_song = _lambda.Function(
@@ -78,6 +90,7 @@ class SongStack(Stack):
             handler="get_details.handle",
             environment={
                 'SONG_TABLE': self.song_table.table_name,
+                'HISTORY_TABLE': self.listening_history.table_name,
             }
         )
         #Transcription
@@ -142,6 +155,7 @@ class SongStack(Stack):
         self.song_table.grant_read_data(self.lambda_get_details)
         self.song_table.grant_read_write_data(self.lambda_transcribe_song)
         self.song_table.grant_read_write_data(self.lambda_transcription_complete)
+        self.listening_history.grant_write_data(self.lambda_get_details)
         artist_stack.artist_table.grant_read_data(self.lambda_create_song)
         artist_stack.artist_songs.grant_read_write_data(self.lambda_create_song)
         genre_stack.genre_content.grant_read_write_data(self.lambda_create_song)
