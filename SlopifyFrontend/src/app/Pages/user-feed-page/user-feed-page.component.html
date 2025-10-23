@@ -1,0 +1,17 @@
+<h2>User Feed</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let s of songs">
+      <td>{{ s.id }}</td>
+      <td><a [routerLink]="['/songs', s.id]">{{ s.name }}</a></td>
+      <td>{{ s.score }}</td>
+    </tr>
+  </tbody>
+</table>

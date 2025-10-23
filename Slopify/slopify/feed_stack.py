@@ -39,6 +39,16 @@ class FeedStack(Stack):
             }
         )
 
+        self.lambda_get_feed = _lambda.Function(
+            self, "GetFeedHandler",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            code=_lambda.Code.from_asset("lambda/feed"),
+            handler="get_feed.handler",
+            environment={
+                "USER_FEED_TABLE": self.user_feed.table_name,
+            }
+        )
+
         self.lambda_on_song_upload = _lambda.Function(
             self, "FeedOnSongUploadHandler",
             runtime=_lambda.Runtime.PYTHON_3_9,
@@ -126,7 +136,8 @@ class FeedStack(Stack):
         genre_stack.genre_content.grant_read_data(self.lambda_generate_feed)
         user_stack.user_subs.grant_read_data(self.lambda_generate_feed)
         user_stack.user_grades.grant_read_data(self.lambda_generate_feed)
-        self.user_feed.grant_write_data(self.lambda_generate_feed)
+        self.user_feed.grant_read_write_data(self.lambda_generate_feed)
+        self.user_feed.grant_read_data(self.lambda_get_feed)
 
         song_stack.song_table.grant_stream_read(self.lambda_on_song_upload)
         artist_stack.artist_songs.grant_read_data(self.lambda_on_song_upload)

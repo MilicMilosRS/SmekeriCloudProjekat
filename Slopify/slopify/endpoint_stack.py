@@ -12,7 +12,7 @@ from slopify import notification_stack
 
 class EndpointStack(Stack):
 
-    def __init__(self, scope: Construct, id: str, song_stack, artist_stack, genre_stack, user_stack, auth_stack, notification_stack, album_stack, **kwargs):
+    def __init__(self, scope: Construct, id: str, song_stack, artist_stack, genre_stack, user_stack, auth_stack, notification_stack, album_stack, feed_stack, **kwargs):
         super().__init__(scope, id, **kwargs)
 
         
@@ -91,7 +91,15 @@ class EndpointStack(Stack):
             authorization_type=apigw.AuthorizationType.COGNITO,
             authorizer=self.authorizer
         )
+        user_feed_resource = user_resource.add_resource("feed")
+        user_feed_resource.add_method(
+            "GET",
+            apigw.LambdaIntegration(feed_stack.lambda_get_feed),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=self.authorizer
+        )
 
+        #Grades
         grades_resource = self.api.root.add_resource("grades")
         grades_resource.add_method(
             "POST",
@@ -114,12 +122,10 @@ class EndpointStack(Stack):
 
         #Notification
         notifications_resource = self.api.root.add_resource("notifications")
-
         notifications_resource.add_method(
             "POST",
             apigw.LambdaIntegration(self.notification_stack.notify_lambda),
         )
-
         
         CfnOutput(self, "ApiUrl", value=self.api.url)
 

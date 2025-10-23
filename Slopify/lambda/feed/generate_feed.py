@@ -18,8 +18,10 @@ def handler(event, context):
 
     feed_songs = {}
 
+    print("calc subs")
     #Subscriptions
     subs = subscriptions_table.query(KeyConditionExpression=Key("userId").eq(email))["Items"]
+    print(subs)
     for sub in subs:
         content_id = sub["contentId"]
         if content_id.startswith("ARTIST#"):
@@ -30,18 +32,26 @@ def handler(event, context):
         elif content_id.startswith("GENRE#"):
             genre_name = sub["contentName"]
             genre_songs = genre_content_table.query(KeyConditionExpression=Key("genreName").eq(genre_name))["Items"]
+            print("GENRE " + genre_name + " SONGS")
+            print(genre_songs)
             for s in genre_songs:
                 if s["contentId"].startswith("SONG#"):
                     song_id = s["contentId"].split("#")[1]
                     feed_songs[song_id] = feed_songs.get(song_id, 0) + 1
+                    print(song_id)
+    print("FEED SONGS")
+    print(feed_songs)
 
+    print("calc rating")
     #Ratings
     grades = grades_table.query(KeyConditionExpression=Key("userId").eq(email))["Items"]
     for g in grades:
         if g["contentId"].startswith("SONG#") and int(g["grade"]) >= 4:
             song_id = g["contentId"].split("#")[1]
             feed_songs[song_id] = feed_songs.get(song_id, 0) + 3
+    print(grades)
 
+    print("calc listening history")
     #ListeningHistory
     history = history_table.query(KeyConditionExpression=Key("userEmail").eq(email))["Items"]
     for h in history:
@@ -49,13 +59,25 @@ def handler(event, context):
         recency_score = max(1, 5 - (days_since(h["timestamp"])))
         feed_songs[song_id] = feed_songs.get(song_id, 0) + recency_score
 
+    print("delete old feed")
+    #Delete old feed
+    old_feed = user_feed_table.query(KeyConditionExpression=Key("userEmail").eq(email))["Items"]
+    if old_feed:
+        with user_feed_table.batch_writer() as batch:
+            for item in old_feed:
+                batch.delete_item(Key={"userEmail": item["userEmail"], "songId": item["songId"]})
+
     #Sort and return
     sorted_songs = sorted(feed_songs.items(), key=lambda x: x[1], reverse=True)
 
+    print("SORTED SONGS")
+    print(sorted_songs)
+
+    print("MISSING SONGS")
     with user_feed_table.batch_writer() as batch:
         for song_id, score in sorted_songs[:20]:
             song = songs_table.get_item(Key={"id": song_id}).get("Item")
-            if song:
+            if song and 'title' in song:
                 batch.put_item(
                     Item={
                         "userEmail": email,
@@ -64,6 +86,8 @@ def handler(event, context):
                         "score": score,
                     }
                 )
+            else:
+                print(song)
 
     return {
         "statusCode": 200,

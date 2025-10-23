@@ -10,6 +10,7 @@ import { CreateSongComponent } from './Pages/create-song/create-song.component';
 import { CreateArtistPageComponent } from './Pages/create-artist-page/create-artist-page.component';
 import { AlbumCreationPageComponent } from './Pages/album-creation-page/album-creation-page.component';
 import { AlbumDetailsPageComponent } from './Pages/album-details-page/album-details-page.component';
+import { UserFeedPageComponent } from './Pages/user-feed-page/user-feed-page.component';
 
 export const routes: Routes = [
     {path:'register', component: RegistrationPageComponent},
@@ -20,6 +21,7 @@ export const routes: Routes = [
     {path:'artists/:id', component: ArtistDetailsPageComponent},
     {path:'albums/new', component: AlbumCreationPageComponent},
     {path:'albums/:id', component: AlbumDetailsPageComponent},
+    {path:'user/feed', component: UserFeedPageComponent},
     {path:'', component: MainPageComponentComponent},
     {path:'subscriptions', component: UserSubscriptionsPageComponent}
 ];
