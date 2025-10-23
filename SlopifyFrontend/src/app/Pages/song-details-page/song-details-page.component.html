@@ -11,7 +11,15 @@
 </div>
 
 <div *ngIf="details.s3SongUrl">
-  <audio [src]="details.s3SongUrl" controls></audio>
+  <audio [src]="audioUrl" controls></audio>
+  <p>
+    Source: 
+    <span *ngIf="loadedFromCache; else webSource">
+      Cache
+      <button (click)="clearCache()">Clear from Cache</button>
+    </span>
+    <ng-template #webSource>Web</ng-template>
+  </p>
 </div>
 
 <div *ngIf="!grade">

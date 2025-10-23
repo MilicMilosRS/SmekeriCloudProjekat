@@ -8,6 +8,7 @@ from aws_cdk import (
     CfnOutput
 )
 from constructs import Construct
+import boto3
 
 class CoreStack(Stack):
 
@@ -22,7 +23,13 @@ class CoreStack(Stack):
             versioned=True,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             removal_policy=RemovalPolicy.DESTROY,
-            auto_delete_objects=True
+            auto_delete_objects=True,
+            cors=[s3.CorsRule(
+                allowed_origins=["*"],
+                allowed_methods=[s3.HttpMethods.GET],
+                allowed_headers=["*"],
+                max_age=3000
+            )]
         )
 
         # CloudFront
@@ -30,7 +37,10 @@ class CoreStack(Stack):
             self, "SlopifyDistribution",
             default_behavior=cloudfront.BehaviorOptions(
                 origin=origins.S3Origin(self.bucket),
-                viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
+                viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                allowed_methods=cloudfront.AllowedMethods.ALLOW_GET_HEAD,
+                cache_policy=cloudfront.CachePolicy.CACHING_OPTIMIZED,
+                origin_request_policy=cloudfront.OriginRequestPolicy.CORS_S3_ORIGIN
             )
         )
 
