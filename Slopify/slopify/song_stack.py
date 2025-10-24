@@ -93,7 +93,6 @@ class SongStack(Stack):
                 'GENRE_TABLE': genre_stack.genre_content.table_name,
                 'CLOUDFRONT_URL': core.distribution.domain_name,
                 'OUTPUT_BUCKET': core.bucket.bucket_name,
-                'TRANSCRIPTION_QUEUE_URL': self.transcription_queue.queue_url,
                 'PREPARE_AUDIO_QUEUE_URL': self.prepare_audio_queue.queue_url,
                 'TOPIC_ARN': notification_stack.notification_topic.topic_arn,
             },

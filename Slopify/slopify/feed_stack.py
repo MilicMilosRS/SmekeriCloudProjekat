@@ -4,7 +4,8 @@ from aws_cdk import (
     aws_dynamodb as dynamodb,
     aws_apigateway as apigw,
     aws_lambda_event_sources as event_source,
-    RemovalPolicy
+    RemovalPolicy,
+    Duration
 )
 from constructs import Construct
 
@@ -28,6 +29,7 @@ class FeedStack(Stack):
             runtime=_lambda.Runtime.PYTHON_3_9,
             code=_lambda.Code.from_asset("lambda/feed"),
             handler="generate_feed.handler",
+            timeout=Duration.seconds(300),
             environment={
                 "SONG_TABLE": song_stack.song_table.table_name,
                 "ARTIST_SONGS_TABLE": artist_stack.artist_songs.table_name,
