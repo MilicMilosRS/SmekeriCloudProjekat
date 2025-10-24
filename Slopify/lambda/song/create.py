@@ -16,6 +16,7 @@ genre_content_table = dynamodb.Table(os.environ["GENRE_TABLE"])
 CLOUDFRONT_URL = os.environ["CLOUDFRONT_URL"]
 bucket_name = os.environ["OUTPUT_BUCKET"]
 sns_client = boto3.client("sns")
+sqs_client = boto3.client('sqs')
 
 
 """Request body should be like
@@ -97,6 +98,13 @@ def handle(event, context):
             "transcription_status": "PENDING",
             "transcript": ""
         }
+        sqs_client.send_message(
+            QueueUrl=os.environ['PREPARE_AUDIO_QUEUE_URL'],
+            MessageBody=json.dumps({
+                "id": item['id'],
+                "s3SongUrl": f"s3://{bucket_name}/{song_filename}"
+            })
+        )
         song_table.put_item(Item=item)
 
         for id in body.get("artistIds", []):
@@ -140,16 +148,6 @@ def handle(event, context):
                 Subject="New Slop-Drop!"
             )
 
-        sqs = boto3.client('sqs')
-        queue_url = os.environ['TRANSCRIPTION_QUEUE_URL']
-
-        sqs.send_message(
-            QueueUrl=queue_url,
-            MessageBody=json.dumps({
-                'id': item['id'],
-                's3SongUrl': f"s3://{bucket_name}/{song_filename}"
-            })
-        )
 
         return {'statusCode': 200,
                 "headers": {

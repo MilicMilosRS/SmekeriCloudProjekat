@@ -2,9 +2,6 @@ import os
 import json
 import boto3
 import io
-import uuid
-import base64
-from pydub import AudioSegment
 from vosk import Model, KaldiRecognizer
 
 dynamodb = boto3.resource("dynamodb")
@@ -12,35 +9,29 @@ s3 = boto3.client("s3")
 song_table = dynamodb.Table(os.environ["SONG_TABLE"])
 bucket_name = os.environ["OUTPUT_BUCKET"]
 
-model_path = "/opt/vosk-model"
-vosk_model = Model(model_path)
+model = Model("/opt/python/vosk-model-small-en-us-0.15")
 
 def handle(event, context):
-    print("Environment vars:", dict(os.environ))
     for record in event['Records']:
+        if 'body' not in record:
+                continue
         body = json.loads(record['body'])
+        print(f"BODY: {body}")
         song_id = body['id']
-        s3_key = body['s3SongUrl'].replace(f"s3://{bucket_name}/", "")
+        wav_key = body['wavKey']
 
-        mp3_obj = s3.get_object(Bucket=bucket_name, Key=s3_key)
-        mp3_bytes = mp3_obj['Body'].read()
+        wav_obj = s3.get_object(Bucket=bucket_name, Key=wav_key)
+        wav_bytes = wav_obj['Body'].read()
 
-        audio = AudioSegment.from_file(io.BytesIO(mp3_bytes), format="mp3")
-        wav_io = io.BytesIO()
-        audio.export(wav_io, format="wav")
-        wav_io.seek(0)
-
-        recognizer = KaldiRecognizer(vosk_model, audio.frame_rate)
+        recognizer = KaldiRecognizer(model, 16000)
         recognizer.SetWords(True)
 
-        data = wav_io.read()
-        if recognizer.AcceptWaveform(data):
+        if recognizer.AcceptWaveform(wav_bytes):
             result = json.loads(recognizer.Result())
         else:
             result = json.loads(recognizer.FinalResult())
 
         transcript_text = result.get("text", "")
-
         song_table.update_item(
             Key={"id": song_id},
             UpdateExpression="set transcript=:t, transcription_status=:s",
@@ -52,5 +43,5 @@ def handle(event, context):
 
     return {
         "statusCode": 200,
-        "body": json.dumps({"message": "Transcription processed"})
+        "body": json.dumps({"message": "Transcription completed"})
     }
