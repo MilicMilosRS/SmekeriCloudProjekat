@@ -158,8 +158,8 @@ class SongStack(Stack):
                 'SONG_TABLE': self.song_table.table_name,
                 'OUTPUT_BUCKET': core.bucket.bucket_name
             },
-            timeout=Duration.seconds(15),
-            memory_size=1024,
+            timeout=Duration.seconds(300),
+            memory_size=2048,
             layers=[self.vosk_layer]
         )
 
@@ -203,7 +203,6 @@ class SongStack(Stack):
         core.bucket.grant_read(self.lambda_transcription_complete)
 
         # SQS Queues
-        self.transcription_queue.grant_send_messages(self.lambda_create_song)
         self.transcription_queue.grant_consume_messages(self.lambda_transcribe_song)
         self.transcription_queue.grant_send_messages(self.lambda_prepare_audio)
 
