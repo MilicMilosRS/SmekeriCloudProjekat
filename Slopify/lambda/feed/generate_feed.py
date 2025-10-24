@@ -73,9 +73,19 @@ def handler(event, context):
     print("SORTED SONGS")
     print(sorted_songs)
 
-    print("MISSING SONGS")
+    #Remove missing songs
+    fr_songs = []
     with user_feed_table.batch_writer() as batch:
-        for song_id, score in sorted_songs[:20]:
+        for song_id, score in sorted_songs:
+            song = songs_table.get_item(Key={"id": song_id}).get("Item")
+            if song and 'title' in song:
+                fr_songs.append(song)
+            else:
+                print(song)
+    
+    #Write songs
+    with user_feed_table.batch_writer() as batch:
+        for song_id, score in fr_songs[:20]:
             song = songs_table.get_item(Key={"id": song_id}).get("Item")
             if song and 'title' in song:
                 batch.put_item(
@@ -86,8 +96,6 @@ def handler(event, context):
                         "score": score,
                     }
                 )
-            else:
-                print(song)
 
     return {
         "statusCode": 200,
